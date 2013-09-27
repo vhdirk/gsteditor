@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: GStreamer Editor Libraries
+Description: Helper libraries for GStreamer's glade-like editor
+Requires: gstreamer = 0.10.3.2
+Version: 0.10.3.2
+Libs: 
+Cflags: -I${includedir}
