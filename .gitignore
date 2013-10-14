@@ -1,0 +1,45 @@
+## CMake
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+CMakeLists.txt.user*
+build/
+
+## C(++)
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+
+## Editors
+# Gedit
+*.*~
+# Vim
+*.swp
+.vim
+# QtCreator
+*.autosave
+
+## This project
+include/config.h
+

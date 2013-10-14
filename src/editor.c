@@ -17,13 +17,10 @@
  * Boston, MA 02111-1307, USA.
  */  
     
-#if defined(_MSC_VER) && defined(NDEBUG)
-#include <windows.h>
-#endif  /*  */
     
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif  /*  */
+#endif
     
 #include <string.h>
     
@@ -34,6 +31,8 @@
 #include <gst/gst.h>
     
 #include <gst/editor/editor.h>
+
+
 int 
 main (int argc, char *argv[]) 
 {
