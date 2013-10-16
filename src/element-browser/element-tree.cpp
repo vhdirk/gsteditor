@@ -17,20 +17,13 @@
 
 #include <iostream>
 
-#include <string.h>
 #include <gtk/gtk.h>
 
 #include "config.h"
-
 #include "element-tree.h"
 
 
-//#include <glade/glade.h>
-//#include <gst/common/gste-common.h>
-//#include <gst/common/gste-marshal.h>
-
 using namespace Gste;
-
 
 //TODO: move to utils
 template <typename T>
@@ -49,7 +42,7 @@ ElementTree::ElementTree()
   : Gtk::VBox()
 {
   //path = gste_get_ui_file ("editor.glade2");
-  std::string ui_path = "/home/dvhaeren/development/gstreamer/gsteditor/data/editor.glade";
+  std::string ui_path = "../data/editor.glade";
   try
   {
     m_builder = Gtk::Builder::create_from_file(ui_path, "quicklaunch_palette");
