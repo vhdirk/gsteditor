@@ -6,7 +6,7 @@
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * GstEditor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
@@ -397,10 +397,8 @@ std::vector<ElementClassTreeNode> &ElementTree::get_class_tree()
     /* loop over all features within the plugin */
     for (GstFeatureList::iterator itt = features.begin(); itt != features.end(); itt++)
     {
-      //FIXME: test if this is a valid element factory
-      Glib::RefPtr<Gst::ElementFactory> ef = Glib::RefPtr<Gst::ElementFactory>::cast_static(*itt);
-
-      if(!ef) continue;
+      Glib::RefPtr<Gst::ElementFactory> ef = Glib::RefPtr<Gst::ElementFactory>::cast_dynamic(*itt);
+      if (!ef) continue;
 
       std::vector<Glib::ustring> keys = ef->get_metadata_keys();
 

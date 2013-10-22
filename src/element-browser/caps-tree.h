@@ -6,7 +6,7 @@
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * GstEditor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
@@ -27,7 +27,7 @@ namespace Gste{
 /*!
  * \brief Provides a treeview filled with gstcaps information
  */
-class CapsTree : public Gtk::TreeView
+class CapsTree : public Gtk::ScrolledWindow
 {
 public:
   /*!
@@ -41,7 +41,9 @@ protected:
 
   virtual void update_caps_tree() = 0;
 
-  bool add_field_to_tree(const Glib::ustring &name, const Glib::ValueBase &value);
+  static Glib::ustring field_value_to_string(Glib::ValueBase & value_base);
+
+  static void field_value_to_string(Glib::ValueBase & value_base, Glib::ustring &valuestr, Glib::ustring &typestr);
 
 
 protected:
@@ -59,7 +61,9 @@ protected:
   ModelColumns m_columns;
 
 protected:
-  Glib::RefPtr<Gtk::TreeStore>      m_store;
+  Glib::RefPtr<Gtk::TreeStore>  m_store;
+  Gtk::TreeView                 m_view;
+
 
 };
 
