@@ -28,13 +28,13 @@ using namespace Gste;
 //TODO: move to utils
 template <typename T>
 std::vector<T> split(const T &s, char delim) {
-    std::vector<T> elems;
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
+  std::vector<T> elems;
+  std::stringstream ss(s);
+  std::string item;
+  while (std::getline(ss, item, delim)) {
+    elems.push_back(item);
+  }
+  return elems;
 }
 
 
@@ -404,7 +404,7 @@ std::vector<ElementClassTreeNode> &ElementTree::get_class_tree()
 
       //bail out of no klassname found
       if (std::find(keys.begin(), keys.end(), "klass") == keys.end())
-      continue;
+        continue;
 
       Glib::ustring klasses = ef->get_metadata("klass");
       std::vector<Glib::ustring> klassnames = split(klasses, '/');
@@ -414,16 +414,16 @@ std::vector<ElementClassTreeNode> &ElementTree::get_class_tree()
       /* loop over all klass names */
       for(std::vector<Glib::ustring>::iterator kit = klassnames.begin(); kit != klassnames.end(); kit++)
       {
-         Glib::ustring klassname = *kit;
-         bool found = find_element_class_tree(currtree, currtree, klassname);
+        Glib::ustring klassname = *kit;
+        bool found = find_element_class_tree(currtree, currtree, klassname);
 
-         if (!found) {
-           ElementClassTreeNode branch;
-           branch.name = klassname;
+        if (!found) {
+          ElementClassTreeNode branch;
+          branch.name = klassname;
 
-           currtree->subclasses.push_back(branch);
-           currtree = &(currtree->subclasses.back());
-         }
+          currtree->subclasses.push_back(branch);
+          currtree = &(currtree->subclasses.back());
+        }
       }
       currtree->factories.push_back(ef);
     }

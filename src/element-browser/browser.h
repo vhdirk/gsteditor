@@ -27,32 +27,29 @@
 namespace Gste
 {
 
-
 class ElementBrowser : public Gtk::Dialog
 { 
 public:
-    ElementBrowser();
+  ElementBrowser();
 
-    Glib::RefPtr<Gst::ElementFactory> pick_modal();
-
-
-private:
-    void on_tree_selection_changed(Glib::RefPtr<Gst::ElementFactory>& factory);
-    void on_tree_activated(Glib::RefPtr<Gst::ElementFactory> &factory);
-
+public:
+  Glib::RefPtr<Gst::ElementFactory> pick_modal();
 
 private:
-    Glib::RefPtr<Gst::ElementFactory> m_factory;
-    Glib::RefPtr<Gst::Element>        m_element;
-
-    ElementCapsTree        m_pads;
-    ElementFactoryCapsTree m_padtemplates;
-
+  void on_tree_selection_changed(Glib::RefPtr<Gst::ElementFactory>& factory);
+  void on_tree_activated(Glib::RefPtr<Gst::ElementFactory> &factory);
 
 private:
-    Gtk::Label m_longname;
-    Gtk::Label m_description;
-    Gtk::Label m_author;
+  Glib::RefPtr<Gst::ElementFactory> m_factory;
+  Glib::RefPtr<Gst::Element>        m_element;
+
+  ElementCapsTree        m_pads;
+  ElementFactoryCapsTree m_padtemplates;
+
+private:
+  Gtk::Label m_longname;
+  Gtk::Label m_description;
+  Gtk::Label m_author;
 };
 
 } //namespace Gste

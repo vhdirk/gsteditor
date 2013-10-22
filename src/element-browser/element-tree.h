@@ -36,12 +36,10 @@ struct ElementClassTreeNode
 };
 
 
-
 class ElementTree : public Gtk::VBox
 {
 public: //constructors
   ElementTree();
-
 
 public: //signals
   typedef sigc::signal<void, Glib::RefPtr<Gst::ElementFactory>& > type_signal_element_selected;
@@ -73,7 +71,6 @@ protected:
 
   void filter_subtree(Gtk::TreeNodeChildren::iterator childiter);
 
-
 protected:
   //Tree model columns:
   class ModelColumns : public Gtk::TreeModel::ColumnRecord
@@ -89,11 +86,9 @@ protected:
 
   ModelColumns m_columns;
 
-
 protected:
   type_signal_element_selected  m_signal_element_selected;
   type_signal_element_activated m_signal_element_activated;
-
 
 private:
   Glib::RefPtr<Gtk::TreeStore>      m_model;

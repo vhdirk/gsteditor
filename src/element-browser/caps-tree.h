@@ -45,7 +45,6 @@ protected:
 
   static void field_value_to_string(Glib::ValueBase & value_base, Glib::ustring &valuestr, Glib::ustring &typestr);
 
-
 protected:
   class ModelColumns : public Gtk::TreeModel::ColumnRecord
   {
@@ -63,8 +62,6 @@ protected:
 protected:
   Glib::RefPtr<Gtk::TreeStore>  m_store;
   Gtk::TreeView                 m_view;
-
-
 };
 
 
@@ -73,6 +70,7 @@ class ElementCapsTree : public CapsTree
 public:
   ElementCapsTree();
 
+public:
   void set_element(Glib::RefPtr<Gst::Element> element);
 
 protected:
@@ -80,7 +78,6 @@ protected:
 
 protected:
   Glib::RefPtr<Gst::Element>        m_element;
-
 };
 
 
@@ -89,6 +86,7 @@ class ElementFactoryCapsTree : public CapsTree
 public:
   ElementFactoryCapsTree();
 
+public:
   void set_element_factory(Glib::RefPtr<Gst::ElementFactory> factory);
 
 protected:
@@ -96,7 +94,6 @@ protected:
 
 protected:
   Glib::RefPtr<Gst::ElementFactory> m_factory;
-
 };
 
 } //namespace Gste

@@ -61,11 +61,10 @@ Glib::ustring CapsTree::field_value_to_string(Glib::ValueBase & value_base)
 
 void CapsTree::field_value_to_string(Glib::ValueBase & value_base, Glib::ustring & valuestr, Glib::ustring & typestr)
 {
-  //Note: I dislike the amount of C that is exposed here, though there currently seems
-  //      no way around that.
+  //NOTE: I dislike the exposing C here, though there currently seems no way around that.
   GType value_type = G_VALUE_TYPE(value_base.gobj());
-  //Note: reinterpret_cast is used, since the compiler seems to think Glib::Value<>
-  //      and Glib::ValueBase are not polymorphic, meaning that dynamic_cast does not work.
+  //NOTE: reinterpret_cast is used here instead of dynamic_cast,
+  //      since the compiler seems to think Glib::Value<> and Glib::ValueBase are not polymorphic.
   if (value_type == G_TYPE_INT)
   {
     Glib::Value<int> value = *reinterpret_cast<Glib::Value<int>*>(&value_base);
@@ -234,7 +233,6 @@ void ElementCapsTree::update_caps_tree()
     /* Add a sub-tree of caps entries */
     this->add_caps_to_tree(caps, row);
 
-    //TODO
     row[m_columns.name] = iter->get_name();
 
     switch(iter->get_direction())
