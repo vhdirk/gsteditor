@@ -67,31 +67,31 @@ void CapsTree::field_value_to_string(Glib::ValueBase & value_base, Glib::ustring
   //      since the compiler seems to think Glib::Value<> and Glib::ValueBase are not polymorphic.
   if (value_type == G_TYPE_INT)
   {
-    Glib::Value<int> value = *reinterpret_cast<Glib::Value<int>*>(&value_base);
+    Glib::Value<int> value = *static_cast<Glib::Value<int>*>(&value_base);
     valuestr = to_string(value.get());
     typestr = "int";
   }
   else if (value_type == G_TYPE_DOUBLE)
   {
-    Glib::Value<double> value = *reinterpret_cast<Glib::Value<double>*>(&value_base);
+    Glib::Value<double> value = *static_cast<Glib::Value<double>*>(&value_base);
     valuestr = to_string(value.get());
     typestr = "double";
   }
   else if (value_type == G_TYPE_BOOLEAN)
   {
-    Glib::Value<bool> value = *reinterpret_cast<Glib::Value<bool>*>(&value_base);
+    Glib::Value<bool> value = *static_cast<Glib::Value<bool>*>(&value_base);
     valuestr = (value.get() ?  "TRUE" : "FALSE");
     typestr = "bool";
   }
   else if (value_type == G_TYPE_STRING)
   {
-    Glib::Value<Glib::ustring> value = *reinterpret_cast<Glib::Value<Glib::ustring>* >(&value_base);
+    Glib::Value<Glib::ustring> value = *static_cast<Glib::Value<Glib::ustring>* >(&value_base);
     valuestr = to_string(value.get());
     typestr = "string";
   }
   else if (value_type == GST_TYPE_FRACTION)
   {
-    Glib::Value<Gst::Fraction> value = *reinterpret_cast<Glib::Value<Gst::Fraction>*>(&value_base);
+    Glib::Value<Gst::Fraction> value = *static_cast<Glib::Value<Gst::Fraction>*>(&value_base);
     std::stringstream ss;
     ss << value.get().num << "/" << value.get().denom;
     valuestr = ss.str();
@@ -99,7 +99,7 @@ void CapsTree::field_value_to_string(Glib::ValueBase & value_base, Glib::ustring
   }
   else if (value_type == GST_TYPE_INT_RANGE)
   {
-    Glib::Value<Gst::IntRange> value = *reinterpret_cast<Glib::Value<Gst::IntRange>*>(&value_base);
+    Glib::Value<Gst::IntRange> value = *static_cast<Glib::Value<Gst::IntRange>*>(&value_base);
     std::stringstream ss;
     ss << "[" << value.get().min << " - " << value.get().max << "]";
     valuestr = ss.str();
@@ -107,7 +107,7 @@ void CapsTree::field_value_to_string(Glib::ValueBase & value_base, Glib::ustring
   }
   else if (value_type == GST_TYPE_DOUBLE_RANGE)
   {
-    Glib::Value<Gst::DoubleRange> value = *reinterpret_cast<Glib::Value<Gst::DoubleRange>*>(&value_base);
+    Glib::Value<Gst::DoubleRange> value = *static_cast<Glib::Value<Gst::DoubleRange>*>(&value_base);
     std::stringstream ss;
     ss << "[" << value.get().min << " - " << value.get().max << "]";
     valuestr = ss.str();
@@ -115,7 +115,7 @@ void CapsTree::field_value_to_string(Glib::ValueBase & value_base, Glib::ustring
   }
   else if (value_type == GST_TYPE_FRACTION_RANGE)
   {
-    Glib::Value<Gst::FractionRange> value = *reinterpret_cast<Glib::Value<Gst::FractionRange>*>(&value_base);
+    Glib::Value<Gst::FractionRange> value = *static_cast<Glib::Value<Gst::FractionRange>*>(&value_base);
     std::stringstream ss;
     ss << "[" << value.get().min.num <<"/"<< value.get().min.denom;
     ss << " - " << value.get().max.num <<"/"<< value.get().max.denom << "]";
@@ -124,7 +124,7 @@ void CapsTree::field_value_to_string(Glib::ValueBase & value_base, Glib::ustring
   }
   else if (value_type == GST_TYPE_LIST)
   {
-    Gst::ValueList valuelist = *reinterpret_cast<Gst::ValueList*>(&value_base);
+    Gst::ValueList valuelist = *static_cast<Gst::ValueList*>(&value_base);
 
     Glib::ustring listvalstr;
 
@@ -224,7 +224,6 @@ void ElementCapsTree::update_caps_tree()
     Glib::RefPtr<Gst::Caps> caps = iter->query_caps(anycaps);
 
     if (!caps){
-      iter++;
       continue;
     }
 
@@ -249,8 +248,6 @@ void ElementCapsTree::update_caps_tree()
     }
     Gtk::TreeModel::Path path = this->m_store->get_path(row);
     this->m_view.expand_row(path, false);
-
-    iter++;
   }
 
 }

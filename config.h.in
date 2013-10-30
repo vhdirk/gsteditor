@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CONFIG_H_
-#define __CONFIG_H_
+#ifndef _GSTE_CONFIG_H_
+#define _GSTE_CONFIG_H_
 
 
 #define PACKAGE "@PACKAGE@"
@@ -24,4 +24,4 @@
 
 
 
-#endif //__CONFIG_H_
+#endif //_GSTE_CONFIG_H_

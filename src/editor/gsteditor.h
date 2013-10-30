@@ -18,8 +18,8 @@
  */
 
 
-#ifndef __GST_EDITOR_H__
-#define __GST_EDITOR_H__
+#ifndef __GSTE_EDITOR_H__
+#define __GSTE_EDITOR_H__
 
 #include <gstreamermm.h>
 #include <gtkmm.h>
@@ -97,4 +97,4 @@ private:
 //void gst_editor_load (GstEditor * editor, const gchar * file_name);
 //void gst_editor_on_spinbutton(GtkSpinButton * spinheight, GstEditor * editor);
 
-#endif /* __GST_EDITOR_H__ */
+#endif /* __GSTE_EDITOR_H__ */

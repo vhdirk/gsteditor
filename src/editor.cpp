@@ -1,5 +1,20 @@
+/* Copyright (C) <2013> Dirk Van Haerenborgh <vhdirk@gmail.com>
+ * This file is part of GstEditor.
+ *
+ * GstEditor is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * GstEditor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-//TODO: create config.h
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -8,32 +23,20 @@
 #include <gtkmm.h>
 #include <gstreamermm.h>
 
-//#include "gst/editor/editor.h"
 #include "element-browser/browser.h"
 #include "editor/editor.h"
 
-
-//#include "gst/debug-ui/debug-ui.h"
-
-int
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
   Gtk::Main kit(argc, argv);
   Gst::init(argc, argv);
-
 
   Glib::OptionContext ctx(PACKAGE);
 
   Glib::OptionGroup gstoptiongroup = Gst::get_option_group();
   ctx.add_group(gstoptiongroup);
 
-
-  //Gst::ElementFactory chosen;
-
-
-  Gste::Editor edit;
-
-  //edit.run(argc, argv);
+//  Gste::Editor editor;
 
   kit.run();
   //brow.show_all();

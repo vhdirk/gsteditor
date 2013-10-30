@@ -92,7 +92,6 @@ include_directories(
 set_property(GLOBAL PROPERTY gsteditor_global_SRC "")
 
 macro(add_gsteditor_source sources)
-
   foreach(_SRC ${ARGV})
     get_filename_component(_ABS_SRC ${_SRC} ABSOLUTE)
     set_property(GLOBAL APPEND PROPERTY gsteditor_global_SRC ${_ABS_SRC})
@@ -115,7 +114,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in  ${CMAKE_CURRENT_SOURCE_D
 add_definitions("-D HAVE_CONFIG_H")
 
 add_subdirectory(src/element-browser)
-#add_subdirectory(src/editor)
+add_subdirectory(src/element-ui)
+add_subdirectory(src/editor)
+add_subdirectory(src/launch-gui)
 
 
 get_property(gsteditor_global_SRC GLOBAL PROPERTY gsteditor_global_SRC)
@@ -131,15 +132,24 @@ target_link_libraries(gst-inspect-gui ${GSTREAMER_LIBRARIES}
                                       ${GLIBMM_LIBRARIES}
 )
 
-#add_executable(gst-editor src/editor.cpp
-#                          ${gsteditor_global_SRC}
-#)
-#
-#target_link_libraries(gst-editor ${GSTREAMER_LIBRARIES}
-#                             ${GSTREAMERMM_LIBRARIES}
-#                             ${GTKMM_LIBRARIES}
-#                             ${GLIBMM_LIBRARIES}
-#)
+add_executable(gst-launch-gui src/gst-launch-gui.cpp
+                               ${gsteditor_global_SRC}
+)
+target_link_libraries(gst-launch-gui ${GSTREAMER_LIBRARIES}
+                                      ${GSTREAMERMM_LIBRARIES}
+                                      ${GTKMM_LIBRARIES}
+                                      ${GLIBMM_LIBRARIES}
+)
+
+add_executable(gst-editor src/editor.cpp
+                          ${gsteditor_global_SRC}
+)
+
+target_link_libraries(gst-editor ${GSTREAMER_LIBRARIES}
+                                 ${GSTREAMERMM_LIBRARIES}
+                                 ${GTKMM_LIBRARIES}
+                                 ${GLIBMM_LIBRARIES}
+)
 
 
 

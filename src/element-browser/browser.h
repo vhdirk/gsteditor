@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GST_ELEMENT_BROWSER_H__
-#define __GST_ELEMENT_BROWSER_H__
+#ifndef __GSTE_ELEMENT_BROWSER_H__
+#define __GSTE_ELEMENT_BROWSER_H__
 
 #include <gstreamermm.h>
 #include <gtkmm.h>
@@ -54,4 +54,4 @@ private:
 
 } //namespace Gste
 
-#endif // __GST_ELEMENT_BROWSER_H__
+#endif // __GSTE_ELEMENT_BROWSER_H__

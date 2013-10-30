@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//TODO: create config.h
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -25,31 +24,21 @@
 #include <gtkmm.h>
 #include <gstreamermm.h>
 
-//#include "gst/editor/editor.h"
 #include "element-browser/browser.h"
-//#include "gst/debug-ui/debug-ui.h"
 
-int
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
   Gtk::Main kit(argc, argv);
   Gst::init(argc, argv);
-
 
   Glib::OptionContext ctx(PACKAGE);
 
   Glib::OptionGroup gstoptiongroup = Gst::get_option_group();
   ctx.add_group(gstoptiongroup);
 
+  Gste::ElementBrowser browser;
 
-  //Gst::ElementFactory chosen;
-
-
-
-  Gste::ElementBrowser brow;
-  //brow.show_all();
-
-  Glib::RefPtr<Gst::ElementFactory> chosen = brow.pick_modal();
+  Glib::RefPtr<Gst::ElementFactory> chosen = browser.pick_modal();
 
   if (chosen){
     std::cout << "selected '" << chosen->get_name() << "'" << std::endl;
