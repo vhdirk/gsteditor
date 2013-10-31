@@ -104,10 +104,14 @@ ElementUI::ElementUI(ElementUIViewMode view_mode):
 {
   m_name.set_text("No element selected");
   m_name.set_justify(Gtk::JUSTIFY_RIGHT);
-  m_name.set_size_request(150, -1);
-  m_name.set_padding(2, 0);
-  this->attach(m_name, 0, 0, 1, 1 );
-  this->attach(m_optionmenu, 1, 0, 1, 1 );
+//  m_name.set_size_request(150, -1);
+//  m_name.set_padding(2, 0);
+
+  Gtk::HPaned * hpane = Gtk::manage(new Gtk::HPaned());
+  this->attach(*hpane, 0, 0, 2, 1);
+  hpane->pack1(m_name);
+  hpane->pack2(m_optionmenu);
+  hpane->show();
 
   m_name.show();
 
@@ -139,11 +143,9 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element)
 
   m_params = list_klass_parameters(element);
 
-  //  params.erase(std::remove_if(params.begin(), params.end(),
-  //                              sigc::mem_fun(*this, &ElementUI::should_hide_parameter)));
-
   if (m_params.size())
   {
+    //TODO: compact view mode
     if(m_viewmode == ELEMENT_UI_VIEW_MODE_COMPACT)
     {
       //compact layout. 1 entry per param
@@ -167,8 +169,6 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element)
 
         if(!param_view) continue;
 
-        //param_view = Gtk::manage(param_view);
-
         Gtk::Label* param_label = Gtk::manage(new Gtk::Label(m_params[i].name));
         param_label->show();
         param_label->set_tooltip_text(m_params[i].blurb);
@@ -181,12 +181,6 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element)
       }
     }
 
-    //        if (g_object_class_find_property (G_OBJECT_GET_CLASS (ui->element),
-    //                "filesize")
-    //            && g_object_class_find_property (G_OBJECT_GET_CLASS (ui->element),
-    //                "offset"))
-    //          offset_hack (ui);
-
   }
   else // element has no properties
   {
@@ -196,10 +190,28 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element)
     
   }
 
+  // display the name of the element as "factory : elem name"
+  // if we are not holding an element but an object, it does not have a factory,
+  // instead we will display "parent factory : parent elem name : [parent object names ... : ] object name "
+  std::vector<Glib::ustring> name_chain;
+  name_chain.push_back(m_element->get_name());
+
+  Glib::RefPtr<Gst::Element> elem = Glib::RefPtr<Gst::Element>::cast_dynamic(m_element);
+  Glib::RefPtr<Gst::Object> obj = m_element;
+  while(! elem){
+    obj = obj->get_parent();
+    elem = Glib::RefPtr<Gst::Element>::cast_dynamic(obj);
+    name_chain.push_back(obj->get_name());
+  }
+
   std::stringstream ss;
-  //TODO
-  //ss << m_element->get_factory()->get_metadata("long-name") << ": " << m_element->get_name();
-  //m_name.set_text(ss.str());
+  ss << elem->get_factory()->get_metadata("long-name");
+  for(std::vector<Glib::ustring>::reverse_iterator it=name_chain.rbegin();
+      it != name_chain.rend(); ++it) {
+    ss << ": " << *it;
+  }
+
+  m_name.set_text(ss.str());
   debug ("done setting element");
 }
 

@@ -32,7 +32,6 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
     m_parse_but(), m_start_but(), m_pause_but()
 {
   /***** set up the GUI *****/
-  //this->signal_delete_event().connect(sigc::mem_fun(*this, &LaunchGUI::quit_live));
   this->set_default_size(500,300);
 
   Gtk::VBox * vbox = Gtk::manage(new Gtk::VBox());
@@ -49,8 +48,6 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
 
   Gtk::HBox * parse_line = Gtk::manage(new Gtk::HBox(false, 3));
   vbox->pack_start(*parse_line, Gtk::PACK_SHRINK);
-
-  //gtk_combo_set_value_in_list (GTK_COMBO (m_pipe_combo), FALSE, FALSE);
 
   //load_history (pipe_combo);
 
@@ -127,10 +124,6 @@ void LaunchGUI::build_debug_page(Gtk::Notebook &notebook)
   //      gtk_label_new ("Debug"));
 }
 
-void LaunchGUI::quit_live()
-{
-  this->close();
-}
 
 void LaunchGUI::on_parse()
 {

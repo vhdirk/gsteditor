@@ -26,25 +26,78 @@
 
 #include "element-browser/browser.h"
 
-int main (int argc, char *argv[])
+namespace Gste
 {
-  Gtk::Main kit(argc, argv);
-  Gst::init(argc, argv);
 
-  Glib::OptionContext ctx(PACKAGE);
+class InspectGUIApp : public Gtk::Application
+{
+public:
+  InspectGUIApp()
+    : Gtk::Application("org.gste.gst-inspect-gui",
+                       Gio::APPLICATION_HANDLES_COMMAND_LINE)
+  {}
 
-  Glib::OptionGroup gstoptiongroup = Gst::get_option_group();
-  ctx.add_group(gstoptiongroup);
+  int on_command_line(const Glib::RefPtr<Gio::ApplicationCommandLine> &cmd)
+  {
+    Glib::OptionContext ctx(PACKAGE);
 
-  Gste::ElementBrowser browser;
+    // add local options
+//    Glib::OptionGroup group("options", "main options");
+//    bool show_gui = false;
+//    Glib::OptionEntry entry;
+//    entry.set_long_name("gui");
+//    entry.set_description("show the gui.");
+//    group.add_entry(entry, show_gui);
+//    ctx.add_group(group);
 
-  Glib::RefPtr<Gst::ElementFactory> chosen = browser.pick_modal();
+    // add GTK options, --help-gtk, etc
+    Glib::OptionGroup gtkgroup(gtk_get_option_group(true));
+    ctx.add_group(gtkgroup);
 
-  if (chosen){
-    std::cout << "selected '" << chosen->get_name() << "'" << std::endl;
-  }else{
-    std::cout << "didn't choose any" << std::endl;
+    // add GStreamer options
+    Glib::OptionGroup gstoptiongroup = Gst::get_option_group();
+    ctx.add_group(gstoptiongroup);
+
+    int argc;
+    char **argv = cmd->get_arguments(argc);
+
+    ctx.parse(argc, argv);
+
+    activate();
+    return 0;
   }
 
-  return 0;
+
+protected:
+
+  void on_activate()
+  {
+    // show the gui
+    main = new ElementBrowser();
+    add_window(*main);
+
+
+    Glib::RefPtr<Gst::ElementFactory> chosen = main->pick_modal();
+
+    if (chosen){
+      std::cout << "selected '" << chosen->get_name() << "'" << std::endl;
+    }else{
+      std::cout << "didn't choose any" << std::endl;
+    }
+  }
+
+protected:
+  ElementBrowser *main;
+};
+
+}
+
+
+
+int main (int argc, char *argv[])
+{
+  // init Gstreamer. Has to be called first!
+  Gst::init(argc, argv);
+
+  return Gste::InspectGUIApp().run(argc, argv);
 }

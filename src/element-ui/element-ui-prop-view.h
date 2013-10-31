@@ -28,6 +28,9 @@
 namespace Gste
 {
 
+/*!
+ * \brief small convenience adapter for GParamSpec
+ */
 struct ParamAdapter
 {
   GParamSpec *param_spec;
@@ -40,7 +43,10 @@ struct ParamAdapter
   bool construct_only;
 };
 
-//TODO: maybe this should be a template class for param_type?
+
+/*!
+ * Base class for creating widgets for Gst Object properties
+ */
 class ElementUIPropView : public Gtk::VBox
 {
 public:

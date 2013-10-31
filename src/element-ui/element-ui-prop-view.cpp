@@ -162,17 +162,20 @@ ElementUIPropViewNumber<T>::ElementUIPropViewNumber(Glib::RefPtr<Gst::Object> el
   this->show();
 
   std::stringstream ss;
-  ss << std::setprecision(5) << std::scientific << minimum_value;
+  ss << std::setprecision(3) << std::scientific << minimum_value;
   m_label_lower.set_text(ss.str());
   grid_spin->attach(m_label_lower, 0, 0, 1, 1);
   m_label_lower.set_justify(Gtk::JUSTIFY_LEFT);
 
-  m_adjustment = Gtk::Adjustment::create(default_value, minimum_value, maximum_value, 1, 10, 10);
-  m_spinbutton.configure(m_adjustment, 1, 0);
+  // As the step size is unknown and variable, 100 steps seems reasonable
+  T range = maximum_value - minimum_value;
+  T stepsize = range/100;
+  m_adjustment = Gtk::Adjustment::create(default_value, minimum_value, maximum_value, stepsize);
+  m_spinbutton.configure(m_adjustment, 1, 3);
   grid_spin->attach(m_spinbutton, 1, 0, 2, 1);
 
   ss.str("");
-  ss << std::setprecision(5) <<  std::scientific << maximum_value;
+  ss << std::setprecision(3) <<  std::scientific << maximum_value;
   m_label_upper.set_text(ss.str());
   grid_spin->attach(m_label_upper, 3, 0, 1, 1);
   m_label_upper.set_justify(Gtk::JUSTIFY_RIGHT);
