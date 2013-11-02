@@ -32,7 +32,7 @@
 using namespace Gste;
 
 
-// The following is a serious drawback in Glibmm: there seems to be nosimple way to query
+// The following is a serious drawback in Glibmm: there seems to be no simple way to query
 // properties of an object.
 std::vector<ParamAdapter> list_klass_parameters(Glib::RefPtr<Gst::Object> element)
 {
@@ -104,8 +104,6 @@ ElementUI::ElementUI(ElementUIViewMode view_mode):
 {
   m_name.set_text("No element selected");
   m_name.set_justify(Gtk::JUSTIFY_RIGHT);
-//  m_name.set_size_request(150, -1);
-//  m_name.set_padding(2, 0);
 
   Gtk::HPaned * hpane = Gtk::manage(new Gtk::HPaned());
   this->attach(*hpane, 0, 0, 2, 1);
@@ -131,7 +129,7 @@ bool ElementUI::should_hide_parameter(ParamAdapter & adapter)
   return false;
 }
 
-void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element)
+void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element, bool playing)
 {
   this->clear_element();
 
@@ -145,6 +143,7 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element)
 
   if (m_params.size())
   {
+
     //TODO: compact view mode
     if(m_viewmode == ELEMENT_UI_VIEW_MODE_COMPACT)
     {
@@ -166,7 +165,6 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element)
       for(int i = 0; i < m_params.size(); ++i)
       {
         ElementUIPropView* param_view = ElementUIPropView::create(m_element, m_params[i]);
-
         if(!param_view) continue;
 
         Gtk::Label* param_label = Gtk::manage(new Gtk::Label(m_params[i].name));
@@ -175,6 +173,7 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element)
         this->attach(*param_label, 0, i+2, 1, 1);
         m_param_labels.push_back(param_label);
 
+        param_view->disable_construct_only(playing);
         param_view->show();
         this->attach(*param_view, 1, i+2, 1, 1);
         m_param_views.push_back(param_view);
@@ -212,6 +211,7 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element)
   }
 
   m_name.set_text(ss.str());
+
   debug ("done setting element");
 }
 
@@ -231,3 +231,14 @@ void ElementUI::clear_element()
 
   m_message.hide();
 }
+
+void ElementUI::disable_construct_only(bool hide)
+{
+  for(std::vector<ElementUIPropView*>::iterator it=m_param_views.begin();
+      it != m_param_views.end(); ++it)
+  {
+    (*it)->disable_construct_only(hide);
+  }
+
+}
+

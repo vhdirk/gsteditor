@@ -22,6 +22,7 @@
 #endif
 
 #include "launch-gui.h"
+#include "common/utils.h"
 
 using namespace Gste;
 
@@ -38,7 +39,7 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
   this->add(*vbox);
 
   try{
-    Glib::RefPtr<Gdk::Pixbuf> icon = Gdk::Pixbuf::create_from_file("/home/dvhaeren/development/gstreamer/gsteditor/data/gst-launch.png");
+    Glib::RefPtr<Gdk::Pixbuf> icon = Gdk::Pixbuf::create_from_file(Gste::get_data_file("gst-launch.png"));
     this->set_icon(icon);
   }catch(Glib::FileError ex) {
     std::cerr << ex.what() << std::endl;
@@ -276,6 +277,7 @@ void LaunchGUI::on_start()
     m_pipe_combo.set_sensitive(false);
     m_status.push("Playing");
 
+    m_element_ui.disable_construct_only(true);
     m_pipeline->set_state(Gst::STATE_PLAYING);
   }else{
     m_pause_but.set_sensitive(false);
@@ -284,8 +286,9 @@ void LaunchGUI::on_start()
     m_pipe_combo.set_sensitive(true);
     m_status.push("Stopped");
 
-    m_pipeline->set_state(Gst::STATE_NULL);
+    m_element_ui.disable_construct_only(false);
 
+    m_pipeline->set_state(Gst::STATE_NULL);
   }
 
 }
@@ -312,5 +315,5 @@ void LaunchGUI::on_selection_changed()
   Gtk::TreeModel::Row row = *iter;
   Glib::RefPtr<Gst::Object> elem = row[m_columns.element];
 
-  m_element_ui.set_element(elem);
+  m_element_ui.set_element(elem, m_start_but.get_active());
 }

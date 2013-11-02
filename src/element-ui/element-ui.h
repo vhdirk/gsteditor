@@ -42,8 +42,11 @@ public:
   ElementUI(ElementUIViewMode view_mode);
 
 public:
-  void set_element(Glib::RefPtr<Gst::Object> &element);
+  void set_element(Glib::RefPtr<Gst::Object> &element, bool playing);
   void clear_element();
+
+  //TODO: i'd like to replace this by an async task watching the element status
+  void disable_construct_only(bool disable=true);
 
 
 protected:

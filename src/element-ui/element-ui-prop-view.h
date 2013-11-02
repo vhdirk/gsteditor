@@ -53,11 +53,15 @@ public:
   static ElementUIPropView* create(Glib::RefPtr<Gst::Object> &element, ParamAdapter & param);
 
   virtual ~ElementUIPropView();
+
+  virtual void disable_construct_only(bool disable=true)=0;
+
 protected:
   virtual void update_async();
 
   virtual void update() = 0;
   virtual void on_value_changed() = 0;
+
 
   void block_element_signals(bool block);
 
@@ -82,10 +86,11 @@ public:
   ElementUIPropViewNumber(Glib::RefPtr<Gst::Object> element, ParamAdapter & param,
                           T minimum_value=0, T maximum_value=100, T default_value=1);
 
+  virtual void disable_construct_only(bool disable=true);
+
 protected:
   virtual void on_value_changed();
   virtual void update();
-
 
 protected:
   Gtk::Label  m_label_lower;
@@ -101,9 +106,12 @@ class ElementUIPropViewSwitch : public ElementUIPropView
 public:
   ElementUIPropViewSwitch(Glib::RefPtr<Gst::Object> element, ParamAdapter & param);
 
+  virtual void disable_construct_only(bool disable=true);
+
 protected:
   virtual void on_value_changed();
   virtual void update();
+
 
 protected:
   Gtk::Switch m_switch;
@@ -115,9 +123,12 @@ class ElementUIPropViewText : public ElementUIPropView
 public:
   ElementUIPropViewText(Glib::RefPtr<Gst::Object> element, ParamAdapter & param);
 
+  virtual void disable_construct_only(bool disable=true);
+
 protected:
   virtual void on_value_changed();
   virtual void update();
+
 
 protected:
   Gtk::Entry m_entry;
@@ -129,9 +140,12 @@ class ElementUIPropViewChoice : public ElementUIPropView
 public:
   ElementUIPropViewChoice(Glib::RefPtr<Gst::Object> element, ParamAdapter & param);
 
+  virtual void disable_construct_only(bool disable=true);
+
 protected:
   virtual void on_value_changed();
   virtual void update();
+
 
 protected:
   std::vector<int>  m_values;
@@ -144,9 +158,12 @@ class ElementUIPropViewFile : public ElementUIPropView
 public:
   ElementUIPropViewFile(Glib::RefPtr<Gst::Object> element, ParamAdapter & param);
 
+  virtual void disable_construct_only(bool disable=true);
+
 protected:
   virtual void on_value_changed();
   virtual void update();
+
 
 protected:
   Gtk::FileChooserButton m_file_button;

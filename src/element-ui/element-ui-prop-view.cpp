@@ -35,8 +35,8 @@ ElementUIPropView* ElementUIPropView::create(Glib::RefPtr<Gst::Object> &element,
 {
   if (param.spec_type == G_TYPE_PARAM_INT)
   {
-     GParamSpecInt* spec = G_PARAM_SPEC_INT(param.param_spec);
-     return new ElementUIPropViewNumber<gint>(element, param, spec->minimum, spec->maximum, spec->default_value);
+    GParamSpecInt* spec = G_PARAM_SPEC_INT(param.param_spec);
+    return new ElementUIPropViewNumber<gint>(element, param, spec->minimum, spec->maximum, spec->default_value);
   }
   if (param.spec_type == G_TYPE_PARAM_UINT)
   {
@@ -112,7 +112,6 @@ ElementUIPropView::~ElementUIPropView()
 {
   if(m_conn_element) m_conn_element.disconnect();
   if(m_conn_widget) m_conn_widget.disconnect();
-
 }
 
 
@@ -212,6 +211,19 @@ void ElementUIPropViewNumber<T>::on_value_changed()
   this->block_element_signals(false);
 }
 
+template <typename T>
+void ElementUIPropViewNumber<T>::disable_construct_only(bool disable)
+{
+  if(m_param.construct_only){
+    m_label_lower.set_sensitive(!disable);
+    m_label_upper.set_sensitive(!disable);
+    m_spinbutton.set_sensitive(!disable);
+    m_hscale.set_sensitive(!disable);
+  }
+}
+
+
+
 //------------------------------------------------------------------------------
 // Toggle
 //------------------------------------------------------------------------------
@@ -244,6 +256,14 @@ void ElementUIPropViewSwitch::on_value_changed()
   this->block_element_signals(false);
 }
 
+void ElementUIPropViewSwitch::disable_construct_only(bool disable)
+{
+  if(m_param.construct_only){
+    m_switch.set_sensitive(!disable);
+  }
+}
+
+
 //------------------------------------------------------------------------------
 // Text
 //------------------------------------------------------------------------------
@@ -272,6 +292,14 @@ void ElementUIPropViewText::on_value_changed()
 
   this->block_element_signals(false);
 }
+
+void ElementUIPropViewText::disable_construct_only(bool disable)
+{
+  if(m_param.construct_only){
+    m_entry.set_sensitive(!disable);
+  }
+}
+
 
 //------------------------------------------------------------------------------
 // Choice
@@ -321,6 +349,13 @@ void ElementUIPropViewChoice::on_value_changed()
   this->block_element_signals(false);
 }
 
+void ElementUIPropViewChoice::disable_construct_only(bool disable)
+{
+  if(m_param.construct_only){
+    m_combo.set_sensitive(!disable);
+  }
+}
+
 //------------------------------------------------------------------------------
 // File
 //------------------------------------------------------------------------------
@@ -364,3 +399,11 @@ void ElementUIPropViewFile::on_value_changed()
 
   this->block_element_signals(false);
 }
+
+void ElementUIPropViewFile::disable_construct_only(bool disable)
+{
+  if(m_param.construct_only){
+    m_file_button.set_sensitive(!disable);
+  }
+}
+

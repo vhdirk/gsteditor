@@ -21,7 +21,7 @@
 
 #include "config.h"
 #include "element-tree.h"
-
+#include "common/utils.h"
 
 using namespace Gste;
 
@@ -41,8 +41,7 @@ std::vector<T> split(const T &s, char delim) {
 ElementTree::ElementTree()
   : Gtk::VBox()
 {
-  //path = gste_get_ui_file ("editor.glade2");
-  std::string ui_path = "../data/editor.glade";
+  std::string ui_path = Gste::get_data_file("editor.glade");
   try
   {
     m_builder = Gtk::Builder::create_from_file(ui_path, "quicklaunch_palette");
