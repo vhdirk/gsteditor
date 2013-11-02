@@ -1,4 +1,7 @@
-/* Copyright (C) <2013> Dirk Van Haerenborgh <vhdirk@gmail.com>
+/* Common utility functions
+ *
+ * Copyright (C) <2013> Dirk Van Haerenborgh <vhdirk@gmail.com>
+ *
  * This file is part of GstEditor.
  *
  * GstEditor is free software; you can redistribute it and/or
@@ -15,14 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GSTE_CONFIG_H_
-#define _GSTE_CONFIG_H_
+#ifndef __GSTE_UTILS_H__
+#define __GSTE_UTILS_H__
+
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#endif
+#include "config.h"
+#include <gstreamermm.h>
+#include <gtkmm.h>
 
 
-#define PACKAGE "@PACKAGE@"
-#define VERSION "0.0.1"
+namespace Gste
+{
 
-#define GST_EDITOR_UNINSTALLED_DATA_DIR "@UNINSTALLED_DATA_DIR@"
-#define GST_EDITOR_DATA_DIR "@DATA_DIR@"
 
-#endif //_GSTE_CONFIG_H_
+/* given the name of the glade file, return the newly allocated full path to it
+ * if it exists and NULL if not. */
+Glib::ustring get_data_file (Glib::ustring filename);
+
+
+}
+
+#endif // __GSTE_UTILS_H__

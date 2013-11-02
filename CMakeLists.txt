@@ -109,10 +109,13 @@ endmacro()
 #set(HEADERS )
 
 set(PACKAGE "gst-editor")
+set(UNINSTALLED_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
+set(DATA_DIR "${CMAKE_INSTALL_PREFIX}/share")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in  ${CMAKE_CURRENT_SOURCE_DIR}/include/config.h)
 add_definitions("-D HAVE_CONFIG_H")
 
+add_subdirectory(src/common)
 add_subdirectory(src/element-browser)
 add_subdirectory(src/element-ui)
 add_subdirectory(src/editor)
