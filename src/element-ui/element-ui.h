@@ -48,9 +48,8 @@ public:
   //TODO: i'd like to replace this by an async task watching the element status
   void disable_construct_only(bool disable=true);
 
-
 protected:
-  bool should_hide_parameter(ParamAdapter & param);
+  void set_page_title(Glib::ustring title);
 
 protected:
   ElementUIViewMode m_viewmode;

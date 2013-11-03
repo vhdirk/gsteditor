@@ -17,6 +17,8 @@
 
 #include <iostream>
 
+#include <glibmm/i18n.h>
+
 #ifdef HAVE_CONFIG_H
 #  include "config.h"
 #endif
@@ -33,7 +35,7 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
     m_parse_but(), m_start_but(), m_pause_but()
 {
   /***** set up the GUI *****/
-  this->set_default_size(500,300);
+  this->set_default_size(640,480);
 
   Gtk::VBox * vbox = Gtk::manage(new Gtk::VBox());
   this->add(*vbox);
@@ -52,9 +54,9 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
 
   //load_history (pipe_combo);
 
-  m_parse_but.set_label("Parse");
-  m_start_but.set_label("Play");
-  m_pause_but.set_label("Pause");
+  m_parse_but.set_label(_("Parse"));
+  m_start_but.set_label(_("Play"));
+  m_pause_but.set_label(_("Pause"));
   m_start_but.set_sensitive(false);
   m_pause_but.set_sensitive(false);
 
@@ -70,14 +72,14 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
   m_store = Gtk::TreeStore::create(m_columns);
   m_view.set_model(m_store);
   m_view.set_headers_visible(false);
-  m_view.append_column("Mix", m_columns.name);
+  m_view.append_column(_("Mix"), m_columns.name);
 
   Glib::RefPtr<Gtk::TreeSelection> selection = m_view.get_selection();
   selection->set_mode(Gtk::SELECTION_SINGLE);
   selection->signal_changed().connect(sigc::mem_fun(*this, &LaunchGUI::on_selection_changed));
 
 
-  Gtk::VBox * prop_box = Gtk::manage(new Gtk::VBox());
+  Gtk::VBox * prop_box = Gtk::manage(new Gtk::VBox(true, 5));
   Gtk::Notebook * notebook = Gtk::manage(new Gtk::Notebook());
 
   build_debug_page (*notebook);
@@ -86,7 +88,7 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
   page_scroll->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
   page_scroll->add(*prop_box);
 
-  notebook->append_page(*page_scroll, "Properties");
+  notebook->append_page(*page_scroll, _("Properties"));
 
   Gtk::ScrolledWindow * list_scroll = Gtk::manage(new Gtk::ScrolledWindow());
   list_scroll->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -98,7 +100,7 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
 
   vbox->pack_start(*pane);
 
-  m_status.push("Stopped");
+  m_status.push(_("Stopped"));
   vbox->pack_end(m_status, false, false);
 
   this->show_all();
@@ -142,7 +144,7 @@ void LaunchGUI::on_parse()
     return;
   }
   if(!m_pipeline){
-    m_status.push("unknown parse error");
+    m_status.push(_("unknown parse error"));
     return;
   }
 
@@ -275,7 +277,7 @@ void LaunchGUI::on_start()
     m_pause_but.set_active(false);
     m_parse_but.set_sensitive(false);
     m_pipe_combo.set_sensitive(false);
-    m_status.push("Playing");
+    m_status.push(_("Playing"));
 
     m_element_ui.disable_construct_only(true);
     m_pipeline->set_state(Gst::STATE_PLAYING);
@@ -284,7 +286,7 @@ void LaunchGUI::on_start()
     m_pause_but.set_active(false);
     m_parse_but.set_sensitive(true);
     m_pipe_combo.set_sensitive(true);
-    m_status.push("Stopped");
+    m_status.push(_("Stopped"));
 
     m_element_ui.disable_construct_only(false);
 
@@ -298,10 +300,10 @@ void LaunchGUI::on_pause()
 {
   if(m_pause_but.get_active()){
     m_pipeline->set_state(Gst::STATE_PAUSED);
-    m_status.push("Paused");
+    m_status.push(_("Paused"));
   }else{
     m_pipeline->set_state(Gst::STATE_PLAYING);
-    m_status.push("Playing");
+    m_status.push(_("Playing"));
   }
 }
 

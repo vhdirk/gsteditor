@@ -20,7 +20,10 @@
 #endif
 
 #include <iostream>
+
 #include <glibmm.h>
+#include <glibmm/i18n.h>
+
 #include <gtkmm.h>
 #include <gstreamermm.h>
 
@@ -80,9 +83,9 @@ protected:
     Glib::RefPtr<Gst::ElementFactory> chosen = main->pick_modal();
 
     if (chosen){
-      std::cout << "selected '" << chosen->get_name() << "'" << std::endl;
+      std::cout << _("selected") << " '" << chosen->get_name() << "'" << std::endl;
     }else{
-      std::cout << "didn't choose any" << std::endl;
+      std::cout << _("didn't choose any") << std::endl;
     }
   }
 

@@ -54,7 +54,7 @@ public:
 
   virtual ~ElementUIPropView();
 
-  virtual void disable_construct_only(bool disable=true)=0;
+  virtual void disable_construct_only(bool disable=true);
 
 protected:
   virtual void update_async();
@@ -84,9 +84,7 @@ class ElementUIPropViewNumber : public ElementUIPropView
 {
 public:
   ElementUIPropViewNumber(Glib::RefPtr<Gst::Object> element, ParamAdapter & param,
-                          T minimum_value=0, T maximum_value=100, T default_value=1);
-
-  virtual void disable_construct_only(bool disable=true);
+                          T minimum_value=0, T maximum_value=100, T default_value=1, bool integer=true);
 
 protected:
   virtual void on_value_changed();
@@ -106,8 +104,6 @@ class ElementUIPropViewSwitch : public ElementUIPropView
 public:
   ElementUIPropViewSwitch(Glib::RefPtr<Gst::Object> element, ParamAdapter & param);
 
-  virtual void disable_construct_only(bool disable=true);
-
 protected:
   virtual void on_value_changed();
   virtual void update();
@@ -122,8 +118,6 @@ class ElementUIPropViewText : public ElementUIPropView
 {
 public:
   ElementUIPropViewText(Glib::RefPtr<Gst::Object> element, ParamAdapter & param);
-
-  virtual void disable_construct_only(bool disable=true);
 
 protected:
   virtual void on_value_changed();
@@ -140,8 +134,6 @@ class ElementUIPropViewChoice : public ElementUIPropView
 public:
   ElementUIPropViewChoice(Glib::RefPtr<Gst::Object> element, ParamAdapter & param);
 
-  virtual void disable_construct_only(bool disable=true);
-
 protected:
   virtual void on_value_changed();
   virtual void update();
@@ -157,8 +149,6 @@ class ElementUIPropViewFile : public ElementUIPropView
 {
 public:
   ElementUIPropViewFile(Glib::RefPtr<Gst::Object> element, ParamAdapter & param);
-
-  virtual void disable_construct_only(bool disable=true);
 
 protected:
   virtual void on_value_changed();

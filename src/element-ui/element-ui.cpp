@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+#include <glibmm/i18n.h>
+
 #include "element-ui.h"
 
 #ifdef _DEBUG
@@ -102,31 +104,42 @@ ElementUI::ElementUI(ElementUIViewMode view_mode):
   m_name(), m_optionmenu(), m_viewmode(view_mode),
   m_message()
 {
-  m_name.set_text("No element selected");
-  m_name.set_justify(Gtk::JUSTIFY_RIGHT);
+  int spacing = 10;
+  this->set_column_spacing(spacing);
+  this->set_row_spacing(spacing);
+
+  int margin = 10;
+  this->set_margin_top(margin);
+  this->set_margin_bottom(margin);
+  this->set_margin_left(margin);
+  this->set_margin_right(margin);
+
+
+  set_page_title(_("No element selected"));
+  m_name.set_justify(Gtk::JUSTIFY_LEFT);
+  m_name.set_margin_bottom(14);
+
+  m_name.set_alignment(Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
 
   Gtk::HPaned * hpane = Gtk::manage(new Gtk::HPaned());
   this->attach(*hpane, 0, 0, 2, 1);
-  hpane->pack1(m_name);
-  hpane->pack2(m_optionmenu);
+  hpane->add1(m_name);
+  hpane->add2(m_optionmenu);
   hpane->show();
 
   m_name.show();
+  m_name.set_use_markup(true);
 
   m_optionmenu.set_visible(m_viewmode == ELEMENT_UI_VIEW_MODE_COMPACT);
-
 }
 
-bool ElementUI::should_hide_parameter(ParamAdapter & adapter)
+void ElementUI::set_page_title(Glib::ustring title)
 {
-  //  if ( (adapter.readable && adapter.writable) ||
-  //       (adapter.readable && m_show_readonly)  ||
-  //       (adapter.writable && m_show_writeonly) &&
-  //       ! (adapter.name in m_exclude_params) )
-  //  {
-
-  //  }
-  return false;
+  std::stringstream ss;
+  ss << "<span weight='bold' size='larger'>";
+  ss << title;
+  ss << "</span>";
+  m_name.set_markup(ss.str());
 }
 
 void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element, bool playing)
@@ -135,7 +148,7 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element, bool playing)
 
   m_element = element;
   if (!m_element){
-    m_name.set_text("No element selected");
+    set_page_title(_("No element selected"));
     return;
   }
 
@@ -156,8 +169,6 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element, bool playing)
 
       m_optionmenu.set_visible(true);
 
-      //        g_signal_connect (G_OBJECT (menu), "deactivate",
-      //            G_CALLBACK (on_optionmenu_deactivate), ui);
     }
     else
     {
@@ -168,6 +179,9 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element, bool playing)
         if(!param_view) continue;
 
         Gtk::Label* param_label = Gtk::manage(new Gtk::Label(m_params[i].name));
+        param_label->set_justify(Gtk::JUSTIFY_LEFT);
+        param_label->set_alignment(Gtk::ALIGN_START, Gtk::ALIGN_CENTER);
+
         param_label->show();
         param_label->set_tooltip_text(m_params[i].blurb);
         this->attach(*param_label, 0, i+2, 1, 1);
@@ -183,10 +197,10 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element, bool playing)
   }
   else // element has no properties
   {
-    m_message.set_text("This element has no properties.");
+    m_message.set_text(_("This element has no properties."));
+    m_message.set_can_focus();
     m_message.show();
     this->attach(m_message, 0, 2, 1, 1);
-    
   }
 
   // display the name of the element as "factory : elem name"
@@ -210,7 +224,7 @@ void ElementUI::set_element(Glib::RefPtr<Gst::Object> & element, bool playing)
     ss << ": " << *it;
   }
 
-  m_name.set_text(ss.str());
+  set_page_title(ss.str());
 
   debug ("done setting element");
 }

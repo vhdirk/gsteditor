@@ -66,12 +66,12 @@ ElementUIPropView* ElementUIPropView::create(Glib::RefPtr<Gst::Object> &element,
   if (param.spec_type == G_TYPE_PARAM_FLOAT)
   {
     GParamSpecFloat* spec = G_PARAM_SPEC_FLOAT(param.param_spec);
-    return new ElementUIPropViewNumber<gfloat>(element, param, spec->minimum, spec->maximum, spec->default_value);
+    return new ElementUIPropViewNumber<gfloat>(element, param, spec->minimum, spec->maximum, spec->default_value, false);
   }
   if (param.spec_type == G_TYPE_PARAM_DOUBLE)
   {
     GParamSpecDouble* spec = G_PARAM_SPEC_DOUBLE(param.param_spec);
-    return new ElementUIPropViewNumber<gdouble>(element, param, spec->minimum, spec->maximum, spec->default_value);
+    return new ElementUIPropViewNumber<gdouble>(element, param, spec->minimum, spec->maximum, spec->default_value, false);
   }
   if (param.spec_type == G_TYPE_PARAM_BOOLEAN)
   {
@@ -101,11 +101,16 @@ ElementUIPropView::ElementUIPropView(Glib::RefPtr<Gst::Object> element, ParamAda
   : Gtk::VBox(),
     m_element(element), m_param(param)
 {
+  this->set_hexpand(true);
+
   m_value_async.init(m_param.value_type);
 
   if (m_param.readable){
     m_conn_element = m_element->connect_property_changed_with_return(param.name, sigc::mem_fun(*this, &ElementUIPropView::update_async));
   }
+
+  this->set_sensitive(m_param.writable);
+
 }
 
 ElementUIPropView::~ElementUIPropView()
@@ -145,23 +150,43 @@ void ElementUIPropView::block_element_signals(bool block)
   }
 }
 
+
+void ElementUIPropView::disable_construct_only(bool disable)
+{
+  if(m_param.construct_only && disable){
+    this->set_sensitive(false);
+    return;
+  }
+
+  if(!disable && m_param.writable)
+  {
+    this->set_sensitive(true);
+  }
+
+}
+
+
 //------------------------------------------------------------------------------
 // Number
 //------------------------------------------------------------------------------
 
 template <typename T>
 ElementUIPropViewNumber<T>::ElementUIPropViewNumber(Glib::RefPtr<Gst::Object> element, ParamAdapter & param,
-                                                    T minimum_value, T maximum_value, T default_value)
+                                                    T minimum_value, T maximum_value, T default_value, bool integer)
   : ElementUIPropView(element, param),
     m_label_lower(), m_label_upper(), m_adjustment(), m_spinbutton(), m_hscale()
 {
   /* spin button stuff */
   Gtk::Grid * grid_spin = Gtk::manage(new Gtk::Grid());
   this->add(*grid_spin);
+  grid_spin->set_hexpand(true);
+
   this->show();
 
   std::stringstream ss;
-  ss << std::setprecision(3) << std::scientific << minimum_value;
+  if(!integer)
+    ss << std::setprecision(3);
+  ss << std::scientific << minimum_value;
   m_label_lower.set_text(ss.str());
   grid_spin->attach(m_label_lower, 0, 0, 1, 1);
   m_label_lower.set_justify(Gtk::JUSTIFY_LEFT);
@@ -174,7 +199,9 @@ ElementUIPropViewNumber<T>::ElementUIPropViewNumber(Glib::RefPtr<Gst::Object> el
   grid_spin->attach(m_spinbutton, 1, 0, 2, 1);
 
   ss.str("");
-  ss << std::setprecision(3) <<  std::scientific << maximum_value;
+  if(!integer)
+    ss << std::setprecision(3);
+  ss <<  std::scientific << maximum_value;
   m_label_upper.set_text(ss.str());
   grid_spin->attach(m_label_upper, 3, 0, 1, 1);
   m_label_upper.set_justify(Gtk::JUSTIFY_RIGHT);
@@ -182,12 +209,14 @@ ElementUIPropViewNumber<T>::ElementUIPropViewNumber(Glib::RefPtr<Gst::Object> el
   m_hscale.set_adjustment(m_adjustment);
   grid_spin->attach(m_hscale, 0, 1, 4, 1);
   m_hscale.set_draw_value(false);
-  m_hscale.set_digits(2);
+  m_hscale.set_hexpand(true);
+
+  if(!integer)
+    m_hscale.set_digits(2);
 
   //make parameter inactive is not writable
-  if(m_param.writable){
-    m_conn_widget = m_adjustment->signal_value_changed().connect(sigc::mem_fun(*this, &ElementUIPropViewNumber::on_value_changed));
-  }
+  m_conn_widget = m_adjustment->signal_value_changed().connect(sigc::mem_fun(*this, &ElementUIPropViewNumber::on_value_changed));
+
 
   this->update_async();
   this->show_all();
@@ -210,19 +239,6 @@ void ElementUIPropViewNumber<T>::on_value_changed()
 
   this->block_element_signals(false);
 }
-
-template <typename T>
-void ElementUIPropViewNumber<T>::disable_construct_only(bool disable)
-{
-  if(m_param.construct_only){
-    m_label_lower.set_sensitive(!disable);
-    m_label_upper.set_sensitive(!disable);
-    m_spinbutton.set_sensitive(!disable);
-    m_hscale.set_sensitive(!disable);
-  }
-}
-
-
 
 //------------------------------------------------------------------------------
 // Toggle
@@ -256,14 +272,6 @@ void ElementUIPropViewSwitch::on_value_changed()
   this->block_element_signals(false);
 }
 
-void ElementUIPropViewSwitch::disable_construct_only(bool disable)
-{
-  if(m_param.construct_only){
-    m_switch.set_sensitive(!disable);
-  }
-}
-
-
 //------------------------------------------------------------------------------
 // Text
 //------------------------------------------------------------------------------
@@ -291,13 +299,6 @@ void ElementUIPropViewText::on_value_changed()
   m_element->set_property(m_param.name, m_entry.get_text());
 
   this->block_element_signals(false);
-}
-
-void ElementUIPropViewText::disable_construct_only(bool disable)
-{
-  if(m_param.construct_only){
-    m_entry.set_sensitive(!disable);
-  }
 }
 
 
@@ -349,12 +350,6 @@ void ElementUIPropViewChoice::on_value_changed()
   this->block_element_signals(false);
 }
 
-void ElementUIPropViewChoice::disable_construct_only(bool disable)
-{
-  if(m_param.construct_only){
-    m_combo.set_sensitive(!disable);
-  }
-}
 
 //------------------------------------------------------------------------------
 // File
@@ -398,12 +393,5 @@ void ElementUIPropViewFile::on_value_changed()
   m_element->set_property(m_param.name, value);
 
   this->block_element_signals(false);
-}
-
-void ElementUIPropViewFile::disable_construct_only(bool disable)
-{
-  if(m_param.construct_only){
-    m_file_button.set_sensitive(!disable);
-  }
 }
 
