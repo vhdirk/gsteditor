@@ -25,6 +25,7 @@
 
 #include "launch-gui.h"
 #include "common/utils.h"
+#include "debug-ui/debug-ui.h"
 
 using namespace Gste;
 
@@ -104,6 +105,8 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
   vbox->pack_end(m_status, false, false);
 
   this->show_all();
+  notebook->set_current_page(1);
+
 
   prop_box->pack_start(m_element_ui, Gtk::PACK_EXPAND_WIDGET);
   m_element_ui.show();
@@ -123,8 +126,9 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
 
 void LaunchGUI::build_debug_page(Gtk::Notebook &notebook)
 {
-  //  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), gst_debug_ui_new (),
-  //      gtk_label_new ("Debug"));
+  //TODO: handle debug page lifetime
+  Gste::DebugUI* debug_ui = new DebugUI();
+  notebook.append_page(*debug_ui, _("Debug"));
 }
 
 

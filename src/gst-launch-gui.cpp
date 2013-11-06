@@ -91,6 +91,7 @@ int main (int argc, char *argv[])
 {
   // init Gstreamer. Has to be called first!
   Gst::init(argc, argv);
+  gst_debug_set_active(true);
 
   return Gste::LaunchGUIApp().run(argc, argv);
 }

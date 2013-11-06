@@ -100,7 +100,8 @@ private:
   Glib::ustring   m_old_filter_text;
 
   Glib::RefPtr<Gtk::Builder>   m_builder;
-  // the following are owned by m_builder.
+
+  // managed by Gtk
   Gtk::VBox *     m_palette;
   Gtk::TreeView * m_view;
   Gtk::Entry*     m_filter_entry;

@@ -117,6 +117,7 @@ add_definitions("-D HAVE_CONFIG_H")
 
 add_subdirectory(src/common)
 add_subdirectory(src/element-browser)
+add_subdirectory(src/debug-ui)
 add_subdirectory(src/element-ui)
 add_subdirectory(src/editor)
 add_subdirectory(src/launch-gui)

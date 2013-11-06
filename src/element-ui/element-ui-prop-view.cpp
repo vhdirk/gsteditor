@@ -214,7 +214,6 @@ ElementUIPropViewNumber<T>::ElementUIPropViewNumber(Glib::RefPtr<Gst::Object> el
   if(!integer)
     m_hscale.set_digits(2);
 
-  //make parameter inactive is not writable
   m_conn_widget = m_adjustment->signal_value_changed().connect(sigc::mem_fun(*this, &ElementUIPropViewNumber::on_value_changed));
 
 

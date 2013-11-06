@@ -16,6 +16,8 @@
  */
 
 #include <iostream>
+#include <glibmm/i18n.h>
+
 
 #include "caps-tree.h"
 
@@ -39,8 +41,8 @@ CapsTree::CapsTree()
   m_store = Gtk::TreeStore::create(m_columns);
   m_view.set_model(m_store);
 
-  m_view.append_column("Name", m_columns.name);
-  m_view.append_column("Info", m_columns.info);
+  m_view.append_column(_("Name"), m_columns.name);
+  m_view.append_column(_("Info"), m_columns.info);
 
   this->add(m_view);
   this->show();
