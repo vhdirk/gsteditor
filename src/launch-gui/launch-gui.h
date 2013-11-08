@@ -18,6 +18,8 @@
 #ifndef __GSTE_LAUNCH_GUI_H__
 #define __GSTE_LAUNCH_GUI_H__
 
+#include <set>
+
 #include <gstreamermm.h>
 #include <gtkmm.h>
 
@@ -37,6 +39,13 @@ private: //slots
   void on_pause();
   void on_parse();
   void on_selection_changed();
+
+  void combo_load_history();
+
+  std::set<Glib::ustring> load_history();
+  void append_history(Glib::ustring & pipeline);
+  Glib::ustring get_history_filename();
+
 
   /**
    * @par Slot Prototype:
@@ -90,6 +99,7 @@ protected:
   Gtk::TreeView     m_view;
 
   Gtk::ComboBoxText m_pipe_combo;
+  Glib::ustring     m_last_pipe;
   Gtk::Statusbar    m_status;
 
   Gtk::Button       m_parse_but;

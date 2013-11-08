@@ -16,6 +16,10 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <set>
+
 
 #include <glibmm/i18n.h>
 
@@ -32,7 +36,7 @@ using namespace Gste;
 
 LaunchGUI::LaunchGUI(int argc, char *argv[])
   : Gtk::Window(Gtk::WINDOW_TOPLEVEL),
-    m_pipe_combo(true), m_status(), m_element_ui(ELEMENT_UI_VIEW_MODE_FULL),
+    m_pipe_combo(true), m_last_pipe(), m_status(), m_element_ui(ELEMENT_UI_VIEW_MODE_FULL),
     m_parse_but(), m_start_but(), m_pause_but()
 {
   /***** set up the GUI *****/
@@ -53,7 +57,7 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
   Gtk::HBox * parse_line = Gtk::manage(new Gtk::HBox(false, 3));
   vbox->pack_start(*parse_line, Gtk::PACK_SHRINK);
 
-  //load_history (pipe_combo);
+  this->combo_load_history();
 
   m_parse_but.set_label(_("Parse"));
   m_start_but.set_label(_("Play"));
@@ -147,6 +151,7 @@ void LaunchGUI::on_parse()
     m_status.push(ex.what());
     return;
   }
+
   if(!m_pipeline){
     m_status.push(_("unknown parse error"));
     return;
@@ -169,27 +174,20 @@ void LaunchGUI::on_parse()
   m_view.expand_all();
 
 
+  //append to history combo
+  if(!m_last_pipe.empty() && m_last_pipe != try_pipe)
+  {
+    m_pipe_combo.append(try_pipe);
+  }
 
-
-
-  //  if (last_pipe == NULL || strcmp (last_pipe, try_pipe) != 0) {
-  //    gchar *write_pipe = g_strdup_printf ("%s\n", try_pipe);
-
-  //    g_object_set_data (G_OBJECT (widget), "last_pipe", try_pipe);
-  //    fwrite (write_pipe, sizeof (gchar), strlen (write_pipe), history_file);
-  //    fflush (history_file);
-  //    history = g_list_prepend (history, try_pipe);
-  //    gtk_combo_set_popdown_strings (GTK_COMBO (pipe_combo), history);
-  //    g_free (write_pipe);
-  //    g_free (last_pipe);
-  //  }
+  //append to history file
+  this->append_history(try_pipe);
 }
 
 
 void LaunchGUI::build_tree (Gtk::TreeModel::Children parent, Glib::RefPtr<Gst::ChildProxy> &childproxy)
 {
 
-  //Glib::RefPtr<Gst::ChildProxy> childproxy(new Gst::ChildProxy(GST_CHILD_PROXY(object->gobj())));
   if(!childproxy) return;
 
   int n_elements = childproxy->get_children_count();
@@ -277,14 +275,24 @@ void LaunchGUI::on_start()
 {
   if(m_start_but.get_active())
   {
-    m_pause_but.set_sensitive(true);
-    m_pause_but.set_active(false);
-    m_parse_but.set_sensitive(false);
-    m_pipe_combo.set_sensitive(false);
-    m_status.push(_("Playing"));
-
-    m_element_ui.disable_construct_only(true);
     m_pipeline->set_state(Gst::STATE_PLAYING);
+
+    Gst::State state, pending;
+    Gst::StateChangeReturn ret = m_pipeline->get_state(state, pending, Gst::CLOCK_TIME_NONE);
+
+    if(ret != Gst::STATE_CHANGE_FAILURE){
+      m_pause_but.set_sensitive(true);
+      m_pause_but.set_active(false);
+      m_parse_but.set_sensitive(false);
+      m_pipe_combo.set_sensitive(false);
+      m_status.push(_("Playing"));
+
+      m_element_ui.disable_construct_only(true);
+    } else {
+      m_start_but.set_active(false);
+      m_status.push(_("Error while settings pipeline to playing state."));
+    }
+
   }else{
     m_pause_but.set_sensitive(false);
     m_pause_but.set_active(false);
@@ -322,4 +330,83 @@ void LaunchGUI::on_selection_changed()
   Glib::RefPtr<Gst::Object> elem = row[m_columns.element];
 
   m_element_ui.set_element(elem, m_start_but.get_active());
+}
+
+
+Glib::ustring LaunchGUI::get_history_filename()
+{
+  Glib::ustring history_path = Glib::build_filename( Glib::get_user_config_dir(), "gsteditor" );
+
+  if (!Glib::file_test(history_path, Glib::FILE_TEST_IS_DIR)){
+    Glib::RefPtr<Gio::File> history_dir = Gio::File::create_for_path(history_path);
+    history_dir->make_directory_with_parents();
+  }
+
+  Glib::ustring history_file = Glib::build_filename( history_path, "gst-launch-gui.history");
+  if (!Glib::file_test(history_file, Glib::FILE_TEST_IS_REGULAR))
+  {
+    Glib::RefPtr<Gio::File> history_f = Gio::File::create_for_path(history_file);
+    history_f->create_file();
+  }
+
+  return history_file;
+}
+
+
+void LaunchGUI::combo_load_history()
+{
+  std::set<Glib::ustring> entries = load_history();
+
+  for(std::set<Glib::ustring>::iterator it=entries.begin();
+      it != entries.end(); ++it)
+  {
+    m_pipe_combo.prepend(*it);
+  }
+}
+
+
+
+
+std::set<Glib::ustring> LaunchGUI::load_history()
+{
+  std::set<Glib::ustring> entries;
+
+  Glib::ustring history_filename = get_history_filename();
+  if (!Glib::file_test(history_filename, Glib::FILE_TEST_IS_REGULAR))
+    return entries;
+
+  std::ifstream histfile(history_filename.c_str());
+  if(histfile.is_open())
+  {
+    std::string line;
+    while (std::getline(histfile, line)){
+      entries.insert(line);
+    }
+
+    histfile.close();
+  }
+  return entries;
+}
+
+
+
+void LaunchGUI::append_history(Glib::ustring & pipeline)
+{
+  Glib::ustring history_filename = get_history_filename();
+
+  std::set<Glib::ustring> entries = load_history();
+  entries.insert(pipeline);
+
+  std::ofstream histfile(history_filename.c_str(), std::ios::out | std::ios::trunc);
+  if(histfile.is_open())
+  {
+    for(std::set<Glib::ustring>::iterator it=entries.begin();
+        it != entries.end(); ++it)
+    {
+      std::string tmp =  *it ;
+      histfile << tmp << std::endl;
+    }
+    histfile.close();
+  }
+
 }
