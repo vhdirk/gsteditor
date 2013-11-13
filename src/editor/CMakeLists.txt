@@ -1,14 +1,15 @@
 
 
 set(editor_HEADERS editor.h
-                   gsteditor.h
-                   #caps-tree.h
+                   editorcanvas.h
+                   editorproperty.h
                    #element-tree.h
                    )
                    
 
-set(editor_SOURCES gsteditor.cpp
-                    #caps-tree.cpp
+set(editor_SOURCES editor.cpp
+                   editorcanvas.cpp
+                   editorproperty.cpp
                     #element-tree.cpp
 )
 
@@ -24,7 +25,7 @@ source_group("include" FILES ${editor_HEADERS})
 
 
 
-add_gsteditor_source(${editor_SOURCES})
+add_source_group(${editor_SOURCES} GROUP "editor")
                    
                    
                    

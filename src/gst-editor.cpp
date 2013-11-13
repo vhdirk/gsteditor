@@ -26,30 +26,75 @@
 #include "element-browser/browser.h"
 #include "editor/editor.h"
 
+
+namespace Gste
+{
+
+class EditorApp : public Gtk::Application
+{
+public:
+  EditorApp()
+    : Gtk::Application("org.gste.gst-editor",
+                       Gio::APPLICATION_HANDLES_COMMAND_LINE)
+  {}
+
+  int on_command_line(const Glib::RefPtr<Gio::ApplicationCommandLine> &cmd)
+  {
+    Glib::OptionContext ctx(PACKAGE);
+
+    // add local options
+//    Glib::OptionGroup group("options", "main options");
+//    bool show_gui = false;
+//    Glib::OptionEntry entry;
+//    entry.set_long_name("gui");
+//    entry.set_description("show the gui.");
+//    group.add_entry(entry, show_gui);
+//    ctx.add_group(group);
+
+    // add GTK options, --help-gtk, etc
+    Glib::OptionGroup gtkgroup(gtk_get_option_group(true));
+    ctx.add_group(gtkgroup);
+
+    // add GStreamer options
+    Glib::OptionGroup gstoptiongroup = Gst::get_option_group();
+    ctx.add_group(gstoptiongroup);
+
+    int argc;
+    char **argv = cmd->get_arguments(argc);
+
+    ctx.parse(argc, argv);
+
+    // show the gui
+    main = new Editor();
+
+    activate();
+    return 0;
+  }
+
+
+protected:
+
+  void on_activate()
+  {
+    add_window(*main);
+    main->show();
+  }
+
+protected:
+  Editor *main;
+};
+
+}
+
+
+
 int main (int argc, char *argv[])
 {
-  Gtk::Main kit(argc, argv);
+  // init Gstreamer. Has to be called first!
   Gst::init(argc, argv);
+  gst_debug_set_active(true);
 
-  Glib::OptionContext ctx(PACKAGE);
-
-  Glib::OptionGroup gstoptiongroup = Gst::get_option_group();
-  ctx.add_group(gstoptiongroup);
-
-//  Gste::Editor editor;
-
-  kit.run();
-  //brow.show_all();
-
-  //int v = brow.pick_modal();
-
-
-  //chosen = (GstElementFactory *) gst_element_browser_pick_modal ();
-  //  if (chosen)
-  //    g_print ("selected '%s'\n", GST_OBJECT_NAME (chosen));
-  //  else
-  //    g_print ("didn't choose any\n");
-  return 0;
+  return Gste::EditorApp().run(argc, argv);
 }
 
 

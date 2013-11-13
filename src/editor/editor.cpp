@@ -1,21 +1,20 @@
-/* GStreamer
- * Copyright (C) <1999> Erik Walthinsen <omega@cse.ogi.edu>
+/* Copyright (C) <2013> Dirk Van Haerenborgh <vhdirk@gmail.com>
+ * This file is part of GstEditor.
  *
- * This library is free software; you can redistribute it and/or
+ * GstEditor is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * GstEditor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
  *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -29,8 +28,9 @@
 
 #include <gtkmm.h>
 
-#include "gsteditor.h"
 
+#include "editor.h"
+#include "common/utils.h"
 
 //#include "gsteditoritem.h"
 //#include "gsteditorelement.h"
@@ -38,7 +38,6 @@
 //#include "stockicons.h"
 //#include <gst/common/gste-common.h>
 //#include <gst/common/gste-debug.h>
-#include "element-browser/browser.h"
 //#include <gst/element-browser/element-tree.h>
 //#include <goocanvas.h>
 //#include "../../../pixmaps/pixmaps.h"
@@ -49,12 +48,13 @@ using namespace Gste;
 
 
 Editor::Editor( /*Gst::Element & element */ )
+  : Gtk::Window(), m_element_tree(), m_canvas()
 {
-
-  std::string ui_path = "/home/dvhaeren/development/gstreamer/gsteditor/data/editor.glade";
+  std::string ui_path = Gste::get_data_file("editor.glade");
+  Glib::RefPtr<Gtk::Builder> builder;
   try
   {
-    builder = Gtk::Builder::create_from_file(ui_path, "main_project_window");
+    builder = Gtk::Builder::create_from_file(ui_path, "main_project_window_content");
   }
   catch (const Glib::FileError & ex)
   {
@@ -62,28 +62,36 @@ Editor::Editor( /*Gst::Element & element */ )
     return;
   }
 
-  builder->get_widget("main_project_window", m_window);
+  Gtk::VBox * content;
+  builder->get_widget("main_project_window_content", content);
+  this->add(*content);
 
-  m_window->show();
 
+  //autoconnecting signals is not supported in gtkmm
   //  glade_xml_signal_autoconnect_full (editor->xml, gst_editor_connect_func,
   //      &data);
+  //gtk_builder_connect_signals(builder, cd);
 
-  //  editor->window = glade_xml_get_widget (editor->xml, "main_project_window");
 
-  //  editor->sw=glade_xml_get_widget (editor->xml, "spinbutton1");
-  //  editor->sh=glade_xml_get_widget (editor->xml, "spinbutton2");
+  builder->get_widget("spinbutton1", m_spin_width);
+  builder->get_widget("spinbutton2", m_spin_height);
 
-  //  gtk_widget_show (editor->window);
-  ////Code for element tree
-  //  editor->element_tree =
-  //      g_object_new (gst_element_browser_element_tree_get_type (), NULL);
-  //  gtk_box_pack_start (GTK_BOX (glade_xml_get_widget (editor->xml,
-  //              "main_element_tree_box")), editor->element_tree, TRUE, TRUE, 0);
-  //  g_signal_connect (editor->element_tree, "element-activated",
-  //      G_CALLBACK (on_element_tree_select), editor);
-  //  gtk_widget_show (editor->element_tree);
-  ////finished
+
+  this->show();
+
+  // element tree
+  Gtk::VBox* element_box;
+  builder->get_widget("main_element_tree_box", element_box);
+  element_box->pack_start(m_element_tree, true, true);
+
+  m_element_tree.signal_element_activated().connect(sigc::mem_fun(*this, &Editor::on_element_tree_select));
+  m_element_tree.show();
+
+
+  Gtk::ScrolledWindow * canvas_sw;
+  builder->get_widget("canvasSW", canvas_sw);
+  canvas_sw->add(m_canvas);
+  m_canvas.show();
 
 
 
@@ -107,6 +115,13 @@ Editor::Editor( /*Gst::Element & element */ )
   //  editor->outputmutex=g_mutex_new();
 
 }
+
+
+void Editor::on_element_tree_select(Glib::RefPtr<Gst::ElementFactory> &factory)
+{
+
+}
+
 
 
 

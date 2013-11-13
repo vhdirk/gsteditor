@@ -40,7 +40,7 @@ source_group("include" FILES ${element_browser_HEADERS})
 
 
 
-add_gsteditor_source(${element_browser_SOURCES})
+add_source_group(${element_browser_SOURCES})
                    
                    
                    

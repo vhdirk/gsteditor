@@ -1,62 +1,104 @@
-/* GStreamer
- * Copyright (C) <1999> Erik Walthinsen <omega@cse.ogi.edu>
+/* Copyright (C) <2013> Dirk Van Haerenborgh <vhdirk@gmail.com>
+ * This file is part of GstEditor.
  *
- * This library is free software; you can redistribute it and/or
+ * GstEditor is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * GstEditor is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
  *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __GST_EDITOR_MAIN_H__
-#define __GST_EDITOR_MAIN_H__
+
+#ifndef __GSTE_EDITOR_H__
+#define __GSTE_EDITOR_H__
+
+#include <gstreamermm.h>
+#include <gtkmm.h>
+
+#include "editor.h"
+#include "editorcanvas.h"
+#include "element-browser/element-tree.h"
+
+namespace Gste
+{
+
+class Editor : public Gtk::Window
+{
+public:
+  Editor( /*Gst::Element & element */);
 
 
-//#include <gst/gst.h>
+protected:
 
-///* FIXME: how does gtk+ manage to do this? */
+  void on_element_tree_select(Glib::RefPtr<Gst::ElementFactory> &factory);
 
-//typedef struct _GstEditor GstEditor;
-//typedef struct _GstEditorClass GstEditorClass;
-//typedef struct _GstEditorBin GstEditorBin;
-//typedef struct _GstEditorBinClass GstEditorBinClass;
-//typedef struct _GstEditorCanvas GstEditorCanvas;
-//typedef struct _GstEditorCanvasClass GstEditorCanvasClass;
-//typedef struct _GstEditorLink GstEditorLink;
-//typedef struct _GstEditorLinkClass GstEditorLinkClass;
-//typedef struct _GstEditorItem GstEditorItem;
-//typedef struct _GstEditorItemClass GstEditorItemClass;
-//typedef struct _GstEditorElement GstEditorElement;
-//typedef struct _GstEditorElementClass GstEditorElementClass;
-//typedef struct _GstEditorPad GstEditorPad;
-//typedef struct _GstEditorPadClass GstEditorPadClass;
-//typedef GstEditorPad GstEditorPadAlways;
-//typedef GstEditorPadClass GstEditorPadAlwaysClass;
-//typedef GstEditorPad GstEditorPadSometimes;
-//typedef GstEditorPadClass GstEditorPadSometimesClass;
-//typedef GstEditorPad GstEditorPadRequest;
-//typedef GstEditorPadClass GstEditorPadRequestClass;
-//typedef GstEditorPad GstEditorPadRequested;
-//typedef GstEditorPadClass GstEditorPadRequestedClass;
-//typedef GstEditorPad GstEditorPadGhost;
-//typedef GstEditorPadClass GstEditorPadGhostClass;
+private:
 
-#include "editor/gsteditor.h"
-//#include "gst/editor/gsteditorbin.h"
-//#include "gst/editor/gsteditorcanvas.h"
-//#include "gst/editor/gsteditorlink.h"
-//#include "gst/editor/gsteditoritem.h"
-//#include "gst/editor/gsteditorelement.h"
-//#include "gst/editor/gsteditorpad.h"
+  Gste::ElementTree m_element_tree;
+  Gste::EditorCanvas m_canvas;
 
-//void gste_init (void);
+  Gtk::SpinButton * m_spin_width;
+  Gtk::SpinButton * m_spin_height;
 
-#endif /* __GST_EDITOR_H__ */
+
+
+};
+
+
+
+
+
+
+
+}
+
+
+//#define GST_TYPE_EDITOR (gst_editor_get_type())
+//#define GST_EDITOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GST_TYPE_EDITOR, GstEditor))
+//#define GST_EDITOR_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GST_TYPE_EDITOR, GstEditorClass))
+//#define GST_IS_EDITOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GST_TYPE_EDITOR))
+//#define GST_IS_EDITOR_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), GST_TYPE_EDITOR))
+//#define GST_EDITOR_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_EDITOR, GstEditorClass))
+
+
+//#define GST_EDITOR_SET_OBJECT(item,object) (g_object_set_data (G_OBJECT (item), "gsteditorobject", (object)))
+//#define GST_EDITOR_GET_OBJECT(item) (g_object_get_data (G_OBJECT (item), "gsteditorobject"))
+
+
+//struct _GstEditor
+//{
+//  GObject object;
+
+//  GladeXML *xml;
+//  GtkWidget *window;
+//  GtkWidget *element_tree;
+//  GtkSpinButton *sw,*sh;
+  
+
+//  gchar *filename;
+//  gboolean changed;
+//  gboolean need_name;
+
+//  GstEditorCanvas *canvas;
+
+//  GData *attributes;//one global attributes location all other point to
+//  GMutex *outputmutex;//only used for time measurement outputs
+//};
+
+//struct _GstEditorClass
+//{
+//  GObjectClass parent_class;
+//};
+
+//GType gst_editor_get_type (void);
+//GtkWidget *gst_editor_new (GstElement * element);
+//void gst_editor_load (GstEditor * editor, const gchar * file_name);
+//void gst_editor_on_spinbutton(GtkSpinButton * spinheight, GstEditor * editor);
+
+#endif /* __GSTE_EDITOR_H__ */

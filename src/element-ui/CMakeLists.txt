@@ -37,6 +37,6 @@ source_group("src" FILES ${element_ui_SOURCES})
 source_group("include" FILES ${element_ui_HEADERS})
 
 
-add_gsteditor_source(${element_ui_SOURCES})
+add_source_group(${element_ui_SOURCES})
                    
                    
