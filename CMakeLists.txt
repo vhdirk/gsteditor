@@ -57,6 +57,9 @@ set(GStreamermm_ROOT "/opt/gnome")
 find_package(GStreamermm 1.0 REQUIRED)
 add_definitions(${GSTREAMERMM_DEFINITIONS})
 
+# GooCanvasmm
+find_package(GooCanvasmm 2.0 REQUIRED)
+
 
 #------------------------------------------------------------------------
 # include & link directories
@@ -67,12 +70,15 @@ include_directories(${GSTREAMER_INCLUDE_DIRS}
 		            ${GSTREAMERMM_INCLUDE_DIRS}
 		            ${GTKMM_INCLUDE_DIRS}
                 ${GLIBMM_INCLUDE_DIRS}
+                ${GOOCANVASMM_INCLUDE_DIRS}
 )
 
 link_directories( ${GSTREAMER_LIBRARY_DIRS}
                   ${GSTREAMERMM_LIBRARY_DIRS}
                   ${GTKMM_LIBRARY_DIRS}
                   ${GLIBMM_LIBRARY_DIRS}
+                  ${GOOCANVASMM_LIBRARY_DIRS}
+
 )
 
 
@@ -89,16 +95,25 @@ include_directories(
 #------------------------------------------------------------------------
 
 # A macro to append to the global source property
-set_property(GLOBAL PROPERTY gsteditor_global_SRC "")
+set(default_group "gsteditor")
+set_property(GLOBAL PROPERTY ${default_group}_global_SRC "")
 
-macro(add_gsteditor_source sources)
-  foreach(_SRC ${ARGV})
+
+function(ADD_SOURCE_GROUP)
+
+  cmake_parse_arguments(ADD_SOURCE_GROUP "" "GROUP" "" ${ARGV})
+
+  if("${ADD_SOURCE_GROUP_GROUP}" STREQUAL "")
+   set(ADD_SOURCE_GROUP_GROUP ${default_group})
+  endif("${ADD_SOURCE_GROUP_GROUP}" STREQUAL "")
+
+  foreach(_SRC ${ADD_SOURCE_GROUP_UNPARSED_ARGUMENTS})
     get_filename_component(_ABS_SRC ${_SRC} ABSOLUTE)
-    set_property(GLOBAL APPEND PROPERTY gsteditor_global_SRC ${_ABS_SRC})
+    set_property(GLOBAL APPEND PROPERTY ${ADD_SOURCE_GROUP_GROUP}_global_SRC ${_ABS_SRC})
   endforeach()
   unset(_SRC)
   unset(_ABS_SRC)
-endmacro()
+endfunction()
 
 
 
@@ -119,12 +134,12 @@ add_subdirectory(src/common)
 add_subdirectory(src/element-browser)
 add_subdirectory(src/debug-ui)
 add_subdirectory(src/element-ui)
-add_subdirectory(src/editor)
 add_subdirectory(src/launch-gui)
 
+add_subdirectory(src/editor)
 
-get_property(gsteditor_global_SRC GLOBAL PROPERTY gsteditor_global_SRC)
 
+get_property(gsteditor_global_SRC GLOBAL PROPERTY ${default_group}_global_SRC)
 
 
 add_executable(gst-inspect-gui src/gst-inspect-gui.cpp
@@ -145,14 +160,20 @@ target_link_libraries(gst-launch-gui ${GSTREAMER_LIBRARIES}
                                       ${GLIBMM_LIBRARIES}
 )
 
-add_executable(gst-editor src/editor.cpp
+get_property(editor_global_SRC GLOBAL PROPERTY editor_global_SRC)
+
+
+add_executable(gst-editor src/gst-editor.cpp
                           ${gsteditor_global_SRC}
+                          ${editor_global_SRC}
+
 )
 
 target_link_libraries(gst-editor ${GSTREAMER_LIBRARIES}
                                  ${GSTREAMERMM_LIBRARIES}
                                  ${GTKMM_LIBRARIES}
                                  ${GLIBMM_LIBRARIES}
+                                 ${GOOCANVASMM_LIBRARIES}
 )
 
 

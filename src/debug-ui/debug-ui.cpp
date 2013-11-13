@@ -50,7 +50,7 @@ Glib::ustring debug_level_get_name(GstDebugLevel debug_level)
 
 
 DebugUI::DebugUI()
-  :Gtk::Bin()
+  : Gtk::Bin()
 {
   std::string ui_path = Gste::get_data_file("editor.glade");
   Glib::RefPtr<Gtk::Builder> builder;

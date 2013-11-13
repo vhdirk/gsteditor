@@ -18,7 +18,7 @@ source_group("include" FILES ${debug_ui_HEADERS})
 
 
 
-add_gsteditor_source(${debug_ui_SOURCES})
+add_source_group(${debug_ui_SOURCES})
                    
                    
                    

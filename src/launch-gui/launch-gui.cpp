@@ -53,27 +53,48 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
   }catch(Gdk::PixbufError ex) {
     std::cerr << ex.what() << std::endl;
   }
+  // status bar
+  vbox->pack_end(m_status, false, false);
 
+  //parse line
   Gtk::HBox * parse_line = Gtk::manage(new Gtk::HBox(false, 3));
   vbox->pack_start(*parse_line, Gtk::PACK_SHRINK);
 
   this->combo_load_history();
 
   m_parse_but.set_label(_("Parse"));
-  m_start_but.set_label(_("Play"));
-  m_pause_but.set_label(_("Pause"));
-  m_start_but.set_sensitive(false);
-  m_pause_but.set_sensitive(false);
 
   parse_line->pack_start(m_pipe_combo);
   parse_line->pack_start(m_parse_but, Gtk::PACK_SHRINK);
-  parse_line->pack_start(m_start_but, Gtk::PACK_SHRINK);
-  parse_line->pack_start(m_pause_but, Gtk::PACK_SHRINK);
+
+  m_parse_but.signal_clicked().connect(sigc::mem_fun(*this, &LaunchGUI::on_parse));
+
+  // media control
+  Gtk::HBox * media_line = Gtk::manage(new Gtk::HBox(false, 3));
+  vbox->pack_end(*media_line, Gtk::PACK_SHRINK);
+  m_start_but.set_image_from_icon_name("media-playback-start");
+  m_pause_but.set_image_from_icon_name("media-playback-pause");
+  m_start_but.set_sensitive(false);
+  m_pause_but.set_sensitive(false);
+  m_progress_bar.set_draw_value(false);
+  m_progress_bar.get_adjustment()->set_lower(0);
+  m_progress_bar.get_adjustment()->set_upper(0);
+
+  m_progress_position.set_text("00:00");
+  m_progress_duration.set_text("00:00");
+
+  media_line->pack_start(m_start_but, Gtk::PACK_SHRINK);
+  media_line->pack_start(m_pause_but, Gtk::PACK_SHRINK);
+  media_line->pack_start(m_progress_position, Gtk::PACK_SHRINK);
+  media_line->pack_start(m_progress_bar, Gtk::PACK_EXPAND_WIDGET);
+  media_line->pack_end(m_progress_duration, Gtk::PACK_SHRINK);
 
   m_start_but.signal_clicked().connect(sigc::mem_fun(*this, &LaunchGUI::on_start));
   m_pause_but.signal_clicked().connect(sigc::mem_fun(*this, &LaunchGUI::on_pause));
-  m_parse_but.signal_clicked().connect(sigc::mem_fun(*this, &LaunchGUI::on_parse));
 
+  m_progress_conn_manual = m_progress_bar.signal_value_changed().connect(sigc::mem_fun(*this, &LaunchGUI::on_progress_changed));
+
+  // element tree
   m_store = Gtk::TreeStore::create(m_columns);
   m_view.set_model(m_store);
   m_view.set_headers_visible(false);
@@ -106,7 +127,6 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
   vbox->pack_start(*pane);
 
   m_status.push(_("Stopped"));
-  vbox->pack_end(m_status, false, false);
 
   this->show_all();
   notebook->set_current_page(1);
@@ -127,6 +147,43 @@ LaunchGUI::LaunchGUI(int argc, char *argv[])
 
 }
 
+
+bool LaunchGUI::update_progress_bar()
+{
+  if(!m_pipeline) return false;
+
+  gint64 duration = 0, position = 0;
+
+  bool success = m_pipeline->query_duration(Gst::FORMAT_TIME, duration) &&
+     m_pipeline->query_position(Gst::FORMAT_TIME, position);
+
+  m_progress_bar.set_sensitive(success);
+  m_progress_bar.get_adjustment()->set_upper(duration);
+  m_progress_bar.get_adjustment()->set_value(position);
+
+  char buff[20];
+  sprintf(buff, "%" GST_TIME_FORMAT "\n", GST_TIME_ARGS(duration));
+  m_progress_duration.set_text(buff);
+
+  sprintf(buff, "%" GST_TIME_FORMAT "\n", GST_TIME_ARGS(position));
+  m_progress_position.set_text(buff);
+
+  return success;
+}
+
+void LaunchGUI::on_progress_changed()
+{
+  if(!m_pipeline) return;
+
+  m_progress_conn_manual.block();
+
+  gint64 position = m_progress_bar.get_value();
+
+  m_pipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH | Gst::SEEK_FLAG_KEY_UNIT, position);
+
+  m_progress_conn_manual.unblock();
+
+}
 
 void LaunchGUI::build_debug_page(Gtk::Notebook &notebook)
 {
@@ -173,6 +230,8 @@ void LaunchGUI::on_parse()
 
   m_view.expand_all();
 
+  //update the slider
+  update_progress_bar();
 
   //append to history combo
   if(!m_last_pipe.empty() && m_last_pipe != try_pipe)
@@ -273,6 +332,8 @@ void LaunchGUI::on_child_removed(const Glib::RefPtr<Gst::Object>& object, const 
 
 void LaunchGUI::on_start()
 {
+  if(m_progress_conn_auto) m_progress_conn_auto.disconnect();
+
   if(m_start_but.get_active())
   {
     m_pipeline->set_state(Gst::STATE_PLAYING);
@@ -281,6 +342,8 @@ void LaunchGUI::on_start()
     Gst::StateChangeReturn ret = m_pipeline->get_state(state, pending, Gst::CLOCK_TIME_NONE);
 
     if(ret != Gst::STATE_CHANGE_FAILURE){
+      m_start_but.set_image_from_icon_name("media-playback-stop");
+
       m_pause_but.set_sensitive(true);
       m_pause_but.set_active(false);
       m_parse_but.set_sensitive(false);
@@ -288,12 +351,17 @@ void LaunchGUI::on_start()
       m_status.push(_("Playing"));
 
       m_element_ui.disable_construct_only(true);
+      update_progress_bar();
+
+      m_progress_conn_auto = Glib::signal_timeout().connect(sigc::mem_fun(*this, &LaunchGUI::update_progress_bar), 200);
+
     } else {
       m_start_but.set_active(false);
       m_status.push(_("Error while settings pipeline to playing state."));
     }
 
   }else{
+    m_start_but.set_image_from_icon_name("media-playback-start");
     m_pause_but.set_sensitive(false);
     m_pause_but.set_active(false);
     m_parse_but.set_sensitive(true);

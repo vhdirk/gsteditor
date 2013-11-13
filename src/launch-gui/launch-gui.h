@@ -47,25 +47,8 @@ private: //slots
   Glib::ustring get_history_filename();
 
 
-  /**
-   * @par Slot Prototype:
-   * <tt>void on_my_%child_added(const Glib::RefPtr<Gst::Object>& object, const Glib::ustring& name)</tt>
-   *
-   * Will be emitted after the @a object was added to the @a child_proxy.
-   * @param object The Object that was added.
-   * @param name The name of the new child.
-   */
 
   void on_child_added(const Glib::RefPtr<Gst::Object>& object, const Glib::ustring& name, Gtk::TreeIter iter);
-
-  /**
-   * @par Slot Prototype:
-   * <tt>void on_my_%child_removed(const Glib::RefPtr<Gst::Object>& object, const Glib::ustring& name)</tt>
-   *
-   * Will be emitted after the @a object was removed from the @a child_proxy.
-   * @param object The Object that was removed.
-   * @param name The name of the old child.
-   */
   void on_child_removed(const Glib::RefPtr<Gst::Object>& object, const Glib::ustring& name, Gtk::TreeIter iter);
 
 
@@ -74,6 +57,9 @@ private: //slots
 
   void watch_childproxies();
   void build_debug_page(Gtk::Notebook &notebook);
+
+  bool update_progress_bar();
+  void on_progress_changed();
 
 protected:
   //Tree model columns:
@@ -105,6 +91,12 @@ protected:
   Gtk::Button       m_parse_but;
   Gtk::ToggleButton m_start_but;
   Gtk::ToggleButton m_pause_but;
+  Gtk::HScale       m_progress_bar;
+  Gtk::Label        m_progress_position;
+  Gtk::Label        m_progress_duration;
+
+  sigc::connection  m_progress_conn_manual;
+  sigc::connection  m_progress_conn_auto;
 
   Glib::RefPtr<Gst::Element>  m_pipeline;
 

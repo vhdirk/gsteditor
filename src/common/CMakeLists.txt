@@ -18,7 +18,7 @@ source_group("include" FILES ${common_HEADERS})
 
 
 
-add_gsteditor_source(${common_SOURCES})
+add_source_group(${common_SOURCES})
                    
                    
                    

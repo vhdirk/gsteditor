@@ -33,5 +33,5 @@ source_group("src" FILES ${launch_gui_SOURCES})
 source_group("include" FILES ${launch_gui_HEADERS})
 
 
-add_gsteditor_source(${launch_gui_SOURCES})
+add_source_group(${launch_gui_SOURCES})
 
