@@ -18,13 +18,15 @@
 
 #include <iostream>
 
+#include <glibmm/i18n.h>
+
 #include "editorproperty.h"
 #include "common/utils.h"
 
 using namespace Gste;
 
 
-EditorProperty::EditorProperty()
+EditorProperty::EditorProperty(Gtk::Window &parent)
   : Gtk::Window(), m_element_ui(ELEMENT_UI_VIEW_MODE_FULL), m_element_caps_tree()
 {
   std::string ui_path = Gste::get_data_file("editor.glade");
@@ -39,6 +41,14 @@ EditorProperty::EditorProperty()
     return;
   }
 
+  this->set_transient_for(parent);
+
+  this->set_title(_("Properties: ..."));
+  this->set_type_hint(Gdk::WINDOW_TYPE_HINT_UTILITY);
+  this->set_position(Gtk::WIN_POS_CENTER_ON_PARENT);
+
+
+  //autoconnecting signals cannot be done in gtkmm
   //  glade_xml_signal_autoconnect_full (property->xml,
   //      gst_editor_property_connect_func, &data);
 

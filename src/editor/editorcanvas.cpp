@@ -19,10 +19,10 @@
 
 using namespace Gste;
 
-EditorCanvas::EditorCanvas()
-  : Goocanvas::Canvas(), m_globallock(), m_property_window()
+EditorCanvas::EditorCanvas(Gtk::Window &parent)
+  : Goocanvas::Canvas(), m_globallock(), m_property_window(parent), m_autosize(true)
 {
-  this->signal_realize().connect(sigc::mem_fun(*this, &EditorCanvas::on_realize));
+  this->set_properties_visible(true);
 }
 
 
@@ -54,16 +54,6 @@ void EditorCanvas::set_properties_visible(bool visible)
 
 }
 
-
-
-void EditorCanvas::on_realize()
-{
-  /* do this now so window manager hints can be set properly */
-  this->set_properties_visible(true);
-  m_property_window.set_transient_for(*dynamic_cast<Gtk::Window*>(this->get_toplevel()));
-
-
-}
 
 
 

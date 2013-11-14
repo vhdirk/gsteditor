@@ -38,13 +38,20 @@ protected:
 
   void on_element_tree_select(Glib::RefPtr<Gst::ElementFactory> &factory);
 
+
+  void on_add();
+  void on_remove();
+
+
 private:
 
-  Gste::ElementTree m_element_tree;
+  Gste::ElementTree  m_element_tree;
   Gste::EditorCanvas m_canvas;
 
   Gtk::SpinButton * m_spin_width;
   Gtk::SpinButton * m_spin_height;
+
+  Gtk::Statusbar *  m_status_bar;
 
 
 

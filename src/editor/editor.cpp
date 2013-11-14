@@ -31,6 +31,7 @@
 
 #include "editor.h"
 #include "common/utils.h"
+#include "element-browser/browser.h"
 
 //#include "gsteditoritem.h"
 //#include "gsteditorelement.h"
@@ -47,8 +48,8 @@
 using namespace Gste;
 
 
-Editor::Editor( /*Gst::Element & element */ )
-  : Gtk::Window(), m_element_tree(), m_canvas()
+Editor::Editor()
+  : Gtk::Window(), m_element_tree(), m_canvas(*this)
 {
   std::string ui_path = Gste::get_data_file("editor.glade");
   Glib::RefPtr<Gtk::Builder> builder;
@@ -84,7 +85,6 @@ Editor::Editor( /*Gst::Element & element */ )
   builder->get_widget("main_element_tree_box", element_box);
   element_box->pack_start(m_element_tree, true, true);
 
-  m_element_tree.signal_element_activated().connect(sigc::mem_fun(*this, &Editor::on_element_tree_select));
   m_element_tree.show();
 
 
@@ -94,25 +94,30 @@ Editor::Editor( /*Gst::Element & element */ )
   m_canvas.show();
 
 
+  builder->get_widget("status_bar", m_status_bar);
 
-  //  editor->canvas =
-  //      (GstEditorCanvas *) g_object_new (GST_TYPE_EDITOR_CANVAS, NULL);
-  //  editor->canvas->autosize =TRUE;
-  //  editor->canvas->parent=editor;
-  //  gtk_widget_show (GTK_WIDGET (editor->canvas));
-
-  //  gtk_container_add (GTK_CONTAINER (glade_xml_get_widget (editor->xml,
-  //              "canvasSW")), GTK_WIDGET (editor->canvas));
 
   //  _num_editor_windows++;
 
-  //  gst_editor_statusbar_init (editor);
 
   //  g_signal_connect (editor->window, "delete-event",
   //      G_CALLBACK (on_delete_event), editor);
   //  g_signal_connect (editor->canvas, "notify", G_CALLBACK (on_canvas_notify),
   //      editor);
   //  editor->outputmutex=g_mutex_new();
+
+
+  //now connect all signals
+  m_element_tree.signal_element_activated().connect(sigc::mem_fun(*this, &Editor::on_element_tree_select));
+
+
+  Gtk::ToolButton * button_add, *button_remove;
+  builder->get_widget("editor_add", button_add);
+  builder->get_widget("editor_remove", button_remove);
+  button_add->signal_clicked().connect(sigc::mem_fun(*this, &Editor::on_add));
+  button_remove->signal_clicked().connect(sigc::mem_fun(*this, &Editor::on_remove));
+
+
 
 }
 
@@ -125,7 +130,40 @@ void Editor::on_element_tree_select(Glib::RefPtr<Gst::ElementFactory> &factory)
 
 
 
+void Editor::on_add()
+{
+  Glib::RefPtr<Gst::ElementFactory> factory = ElementBrowser().pick_modal();
 
+  if(factory){
+     Glib::RefPtr<Gst::Element> element = Gst::ElementFactory::create_element(factory->get_name());
+
+     if(!element){
+       std::cerr << "unable to create element of type '" << factory->get_name() << "'" << std::endl;
+       return;
+     }
+
+//    /* the object_added signal takes care of drawing the gui */
+//    gst_bin_add (GST_BIN (GST_EDITOR_ITEM (editor->canvas->bin)->object),
+//        element);
+  }
+}
+
+
+
+void Editor::on_remove()
+{
+  //  GstEditorElement *element = NULL;
+
+  //  g_object_get (editor->canvas, "selection", &element, NULL);
+
+  //  if (!element) {
+  //    gst_editor_statusbar_message
+  //        ("Could not remove element: No element currently selected.");
+  //    return;
+  //  }
+
+  //  gst_editor_element_remove (element);
+}
 
 
 //#define GST_CAT_DEFAULT gste_debug_cat
@@ -193,122 +231,9 @@ void Editor::on_element_tree_select(Glib::RefPtr<Gst::ElementFactory> &factory)
 //   GTK_RESPONSE ones are negative ? */
 //#define GST_EDITOR_RESPONSE_DEBUG 1
 
-//GType
-//gst_editor_get_type (void)
-//{
-//  static GType project_editor_type = 0;
-
-//  if (!project_editor_type) {
-//    static const GTypeInfo project_editor_info = {
-//      sizeof (GstEditorClass),
-//      (GBaseInitFunc) NULL,
-//      (GBaseFinalizeFunc) NULL,
-//      (GClassInitFunc) gst_editor_class_init,
-//      NULL,
-//      NULL,
-//      sizeof (GstEditor),
-//      0,
-//      (GInstanceInitFunc) gst_editor_init,
-//    };
-
-//    project_editor_type =
-//        g_type_register_static (G_TYPE_OBJECT, "GstEditor",
-//        &project_editor_info, 0);
-//  }
-//  return project_editor_type;
-//}
-
-//static void
-//gst_editor_class_init (GstEditorClass * klass)
-//{
-//  GList *list;
-//  GdkPixbuf *pixbuf;
-//  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
-
-//  parent_class = g_type_class_ref (G_TYPE_OBJECT);
-
-//  gobject_class->get_property = gst_editor_get_property;
-//  gobject_class->set_property = gst_editor_set_property;
-//  gobject_class->dispose = gst_editor_dispose;
-
-//  g_object_class_install_property (gobject_class, PROP_FILENAME,
-//      g_param_spec_string ("filename", "Filename", "File name",
-//          NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
-
-//  _gst_editor_stock_icons_init ();
-
-//  /* give all windows the same icon (in theory) */
-//  pixbuf = gdk_pixbuf_new_from_inline (-1, gst_editor_stock_image, FALSE, NULL);
-//  list = g_list_prepend (NULL, pixbuf);
-//  gtk_window_set_default_icon_list (list);
-
-//  g_list_free (list);
-//  g_object_unref (G_OBJECT (pixbuf));
-//}
-
-//static void
-//gst_editor_init (GstEditor * editor)
-//{
-//  connect_struct data;
-//  GModule *symbols;
-//  gchar *path;
-
-//  symbols = g_module_open (NULL, 0);
-
-//  data.editor = editor;
-//  data.symbols = symbols;
-
-//  path = gste_get_ui_file ("editor.glade2");
-//  if (!path)
-//    g_error ("GStreamer Editor user interface file 'editor.glade2' not found.");
-//  editor->xml = glade_xml_new (path, "main_project_window", NULL);
-
-//  if (!editor->xml) {
-//    g_error ("GStreamer Editor could not load main_project_window from %s",
-//        path);
-//  }
-//  g_free (path);
-
-//  glade_xml_signal_autoconnect_full (editor->xml, gst_editor_connect_func,
-//      &data);
-
-//  editor->window = glade_xml_get_widget (editor->xml, "main_project_window");
-
-//  editor->sw=glade_xml_get_widget (editor->xml, "spinbutton1");
-//  editor->sh=glade_xml_get_widget (editor->xml, "spinbutton2");
-
-//  gtk_widget_show (editor->window);
-////Code for element tree
-//  editor->element_tree =
-//      g_object_new (gst_element_browser_element_tree_get_type (), NULL);
-//  gtk_box_pack_start (GTK_BOX (glade_xml_get_widget (editor->xml,
-//              "main_element_tree_box")), editor->element_tree, TRUE, TRUE, 0);
-//  g_signal_connect (editor->element_tree, "element-activated",
-//      G_CALLBACK (on_element_tree_select), editor);
-//  gtk_widget_show (editor->element_tree);
-////finished
 
 
 
-//  editor->canvas =
-//      (GstEditorCanvas *) g_object_new (GST_TYPE_EDITOR_CANVAS, NULL);
-//  editor->canvas->autosize =TRUE;
-//  editor->canvas->parent=editor;
-//  gtk_widget_show (GTK_WIDGET (editor->canvas));
-
-//  gtk_container_add (GTK_CONTAINER (glade_xml_get_widget (editor->xml,
-//              "canvasSW")), GTK_WIDGET (editor->canvas));
-
-//  _num_editor_windows++;
-
-//  gst_editor_statusbar_init (editor);
-
-//  g_signal_connect (editor->window, "delete-event",
-//      G_CALLBACK (on_delete_event), editor);
-//  g_signal_connect (editor->canvas, "notify", G_CALLBACK (on_canvas_notify),
-//      editor);
-//  editor->outputmutex=g_mutex_new();
-//}
 
 //static void
 //gst_editor_set_property (GObject * object, guint prop_id, const GValue * value,

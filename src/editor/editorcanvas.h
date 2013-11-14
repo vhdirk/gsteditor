@@ -31,16 +31,17 @@ namespace Gste
 class EditorCanvas : public Goocanvas::Canvas
 {
 public:
-  EditorCanvas();
+  EditorCanvas(Gtk::Window &parent);
   virtual ~EditorCanvas(){}
 
 public:
   void set_properties_visible(bool visible);
 
 protected:
-  virtual void on_realize();
+
 
 private:
+  bool m_autosize;
 
   Glib::StaticRWLock m_globallock;
   EditorProperty     m_property_window;

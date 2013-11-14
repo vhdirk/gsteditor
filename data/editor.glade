@@ -676,7 +676,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="button8">
+              <object class="GtkToolButton" id="editor_add">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="stock_id">gtk-add</property>
@@ -688,7 +688,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="button9">
+              <object class="GtkToolButton" id="editor_remove">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="stock_id">gtk-remove</property>

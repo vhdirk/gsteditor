@@ -30,7 +30,7 @@ namespace Gste{
 class EditorProperty : public Gtk::Window
 {
 public:
-  EditorProperty();
+  EditorProperty(Gtk::Window & parent);
 
   void set_parent_window(Gtk::Window & window);
 private:
