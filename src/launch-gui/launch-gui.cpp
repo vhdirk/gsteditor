@@ -154,6 +154,8 @@ bool LaunchGUI::update_progress_bar()
 
   gint64 duration = 0, position = 0;
 
+  m_progress_conn_manual.block();
+
   bool success = m_pipeline->query_duration(Gst::FORMAT_TIME, duration) &&
      m_pipeline->query_position(Gst::FORMAT_TIME, position);
 
@@ -168,6 +170,9 @@ bool LaunchGUI::update_progress_bar()
   sprintf(buff, "%" GST_TIME_FORMAT "\n", GST_TIME_ARGS(position));
   m_progress_position.set_text(buff);
 
+
+  m_progress_conn_manual.unblock();
+
   return success;
 }
 
@@ -175,13 +180,9 @@ void LaunchGUI::on_progress_changed()
 {
   if(!m_pipeline) return;
 
-  m_progress_conn_manual.block();
-
   gint64 position = m_progress_bar.get_value();
 
   m_pipeline->seek(Gst::FORMAT_TIME, Gst::SEEK_FLAG_FLUSH | Gst::SEEK_FLAG_KEY_UNIT, position);
-
-  m_progress_conn_manual.unblock();
 
 }
 
